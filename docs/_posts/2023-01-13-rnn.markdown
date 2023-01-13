@@ -1,0 +1,292 @@
+---
+layout: post
+title:  "A Recurrent Neural Networks Primer"
+date:   2023-01-13 00:00:00 -0500
+categories: jekyll update
+regenerate: true
+---
+
+### Recurrent Neural Networks - A Deep Dive
+
+Recurrent Neural Networks (RNNs) are a type of neural network that are specifically designed to process sequential data, such as text, speech, or time series data. One of the key features of RNNs is their ability to retain information from past inputs, which allows them to understand context and relationships within a sequence.
+
+A few years ago, RNNs were considered the state-of-the-art method for neural machine translation, which is the task of automatically translating text from one language to another. The ability of RNNs to understand context and relationships within a sequence of words allows them to produce more accurate translations.
+
+Modern architectures for large language models (LLMs) such as GPT are built on top of RNNs and use other techniques such as transformer networks to improve performance. RNNs remain a fundamental building block for many of these more advanced models.
+
+## RNN: Algorithm and weights
+
+A Recurrent Neural Network (RNN) is a type of neural network that is specifically designed to process sequential data[1]. An RNN can be thought of as a neural network that has a "memory", allowing it to retain information from past inputs. This allows the network to understand context and relationships within a sequence.
+
+Mathematically, an RNN is defined by a set of weight matrices and a recurrent activation function. The weight matrices, usually denoted as $$\bar{U}$$, $$\bar{W}$$, and $$\bar{V}$$, are used to transform the input, hidden state, and output respectively. The recurrent activation function, usually denoted as $h(.)$, is used to update the hidden state at each time step.
+
+The basic algorithm for an RNN can be described as follows:
+
+1. Given an input vector $$x_t$$ at time step $$t$$, and a hidden state vector $$\vec{h}^{t-1}$$ at time step $$t-1$$, the new hidden state $$\vec{h}^t$$ is computed as:
+
+$$
+\begin{aligned}
+\vec{h}^t &=& h(\bar{W}, \bar{U}, \vec{h}^{t-1}, \vec{x}^t) \\
+&=& h(\bar{W} \vec{h}^{t-1} + \bar{U} \vec{x}^t)
+\end{aligned}
+$$
+
+where the $$i$$ component of $$\vec h$$ is from the $I components of the argument.
+
+2. Given the new hidden state $$\vec{h}^t$$, the output vector $$\tilde{y}$$ is computed as:
+
+$$
+\tilde{y} = \bar{V} \vec{h}^t
+$$
+
+In 2. I'm using the tilde to note that this is our prediction for the output. The ground truth output is $$\vec{y}$$. It's worth noting that in this notation the time step is an upper index and the components of the vector will be lower (e.g. vector component $$i$$ for time step $$t$$ is $$y_i^t$$).
+
+It is important to note that the weight matrices $$\bar{U}$$, $$\bar{W}$$, and $$\bar{V}$$ are shared across all timesteps, meaning the same weight matrices are used for all the elements on the sequence.
+
+## RNN: Training the weight matrices
+
+The first order derivatives of the weight matrices $$\bar{U}$$, $$\bar{W}$$, and $$\bar{V}$$ are used to update the weights during the training process. These derivatives can be calculated using backpropagation through time (BPTT), which is an extension of the standard backpropagation algorithm for RNNs.
+
+Let's assume that the network's loss function is denoted as $$L$$, and, using the same notation as earlier, the hidden state and output vectors at each time step are denoted as $$h_t$$ and $$y_t$$, respectively. Then, the first order derivatives of the weight matrices can be calculated using the chain rule:
+
+$$
+\partial L/\partial U = \sum_t (\partial L/\partial h_t) * (\partial h_t/\partial U)
+$$
+
+where $$(\partial L/\partial h_t)$$ is the gradient of the loss function with respect to the hidden state vector at time step $$t$$, and $$(\partial h_t/\partial U)$$ is the gradient of the hidden state vector with respect to the matrix $$\bar U$$. That final partial derivative might also have a chain rule in it. Similar derivatives for $$W$$ and $$V$$ can be constructed.
+
+### An example
+
+All of that is a bit abstract, so let's choose a specific problem to solve, work through the algebra, and implement it in python. You can find the code [here](https://gist.github.com/mcminis1/33238787522303ab12bf036dd8cd1501).
+
+## The problem
+
+Let's try to fit something that's very easy to test, a sine function: $$\sin(x) = y$$. Although this is not something we'd do in the "real world" it's a good starter problem to get a better understanding of the math and how RNNs work. We can play around with the dimensions of the input vector $$D_x$$, hidden weights $$D_h$$, and output vector $$D_y$$, and the loss function.
+
+For starters we will choose RMSE for the loss function,
+
+$$ 
+L = \frac{1}{2}\sum_{i=1}^{D_y} (\tilde{y}_i - y_i)^2 
+$$
+
+In many introductions to RNN you'll note that the output is usually a single data point. It's either the next character in a char-rnn, or the next data point in a time series one. In this derivation and code we're going to use the more general for so that we could predict any number of data points.
+
+For the activation function $$h(.)$$ we'll use the sigmoid function, $$\sigma$$
+
+$$
+ \sigma(x) = \frac{1}{1+\exp{(-x)}}
+$$
+
+Another popular choice is tanh. The choice of nonlinearity is arbitrary as long as it smoothly approaches a constant as $$x \rightarrow \infty$$ and $$x \rightarrow -\infty$$.
+
+## Matrix Derivatives: V
+
+First, we'll work on $$\bar{V}$$. It's the most straighforward derivative because it does not have a recurrent component like $$\bar U$$ or $$\bar W$$.
+
+$$
+ \frac{dL}{dV} = \frac{\partial L}{ \partial \tilde{y}}\frac{\partial \tilde{y}}{ \partial V} 
+$$
+
+However, these are all matrices, so we should add in the indices and track them.
+
+$$
+\frac{dL_i}{dV_{\alpha\beta}} = \frac{\partial L_i}{ \partial \tilde{y}_j}\frac{\partial \tilde{y}_j}{ \partial V_{\alpha\beta}} 
+$$
+
+expanding these partials yields,
+
+$$
+\begin{aligned}
+\frac{\partial L_i}{ \partial \tilde{y}_j} &=& (\tilde{y}_j - y_j) \delta_{i,j} \\
+\frac{\partial \tilde{y}_j}{ \partial V_{\alpha\beta}} &=& \frac{\partial }{ \partial V_{\alpha\beta}} V_{jk} h_k \\
+&=& h_k \delta_{\alpha, j}\delta_{\beta, k} 
+\end{aligned}
+$$
+
+So that we get
+
+$$ 
+\begin{aligned}
+\frac{dL_i}{dV_{\alpha\beta}} &=& (\tilde{y}_j - y_j) \delta_{i,j} h_k \delta_{\alpha, j}\delta_{\beta, k} \\
+\frac{dL_i}{dV_{i k}} &=& (\tilde{y}_i - y_i) h_k 
+\end{aligned}
+$$
+
+We can compute this derivative easily using an outer product computed at the last step of the RNN ($$D_x$$):
+
+$$
+\frac{dL}{d\bar{V}} = (\tilde{y} - \vec y) \otimes \vec{h}^{D_x}
+$$
+
+## Matrix derivatives: The recurrent ones
+
+The $$\bar U$$ and $$\bar W$$ matrices are more complicated because they are recurrent. I'll work through $$\bar U$$ and leave $$\bar W$$ as an exercise for the reader.
+
+$$
+\frac{dL_i}{dU_{\alpha\beta}} = \frac{\partial L_i}{ \partial \tilde{y}_j} \frac{\partial \tilde{y}_j}{\partial h_k} \frac{\partial h_k}{ \partial U_{\alpha\beta}}  
+$$
+
+The first two parts are straightforward and computed at step $$t = D_x$$:
+
+$$ 
+\begin{aligned}
+\frac{\partial L_i}{\partial y_j} &=& (\tilde{y}_j - y_j) \delta_{i,j} \\
+\frac{\partial y_j}{\partial h_k} &=& V_{jk} 
+\end{aligned}
+$$
+
+We need to add the time index back to the $$h$$ vector because we're in the recursive part.
+
+$$
+\begin{aligned}
+\frac{\partial h_k^t}{ \partial U_{\alpha\beta}} &=& 
+    \frac{\partial }{ \partial U_{\alpha\beta}} \sigma(\bar W, \bar U, \vec{h}^{t-1}, \vec{x}^t) \\
+    &=& \sigma(\bar W, \bar U, \vec{h}^{t-1}, \vec{x}^t) \left[ 1 - \sigma(\bar W, \bar U, \vec{h}^{t-1}, \vec{x}^t)\right] \times \\
+    && \frac{\partial }{\partial U_{\alpha\beta}} 
+        \left( W_{kl} h_l^{t-1} + U_{kl} x_l^t \right)
+\end{aligned}
+$$
+
+where the outer derivative is due to the relationship $$d\sigma(x) / dy = \sigma(x)(1-\sigma(x)) dx/dy$$. The inner derivative becomes:
+
+$$
+\begin{aligned}
+\frac{\partial }{\partial U_{\alpha\beta}} 
+        \left( W_{kl} h_l^{t-1} + U_{km} x_m^t \right) &=&
+\frac{\partial}{\partial U_{\alpha\beta}} U_{km} x_m^t
++ W_{kl} \frac{\partial}{\partial U_{\alpha\beta}}  h_l^{t-1}
+ \\
+ &=& x_m^t \delta_{\alpha,k}\delta_{\beta,m} + \frac{\partial h_l^{t-1}}{\partial U_{\alpha\beta}}
+\end{aligned}
+$$
+
+Now the recursion should be obvious. The partial w.r.t $$h^t$$ depends on the partial w.r.t. $$h^{t-1}$$. To figure out what this should be, we can use a proof by induction. We will start from the first time step, compute the derivative, then do the same after a step to get a feeling for the pattern.
+
+At the first step $$t=1$$ we start with an empty $$h$$ vector (e.g. $$\vec h^{0} = \vec{0}$$)
+
+$$
+\begin{aligned}
+\vec{h}^1 &=& \frac{1}{1+\exp{\left(\bar{U}\cdot\vec{x}^1\right)}}\\
+h_k^1 &=& \frac{1}{1+\exp{\left(U_{kn} x_n^1\right)}}\\
+\frac{\partial h_k^1}{ \partial U_{\alpha\beta}} &=& h_k^1 (1-h_k^1) \delta_{\alpha,k} \delta_{\beta,n} x_n^1 \\
+\frac{\partial h_i^1}{ \partial U_{ij}} &=& h_i^1 (1-h_i^1) x_j^1  \\
+\frac{\partial \vec h^1}{ \partial \bar U} &=& h^1 (1-h^1) \otimes x^1  
+\end{aligned}
+$$
+
+For step $$t=2$$:
+
+$$
+\begin{aligned}
+\vec{h}^2 &=& \frac{1}{1+\exp{\left(\bar{W}\cdot\vec{h}^1 + \bar{U}\cdot\vec{x}^2\right)}}\\
+h_k^2 &=& \frac{1}{1+\exp{\left(W_{km} h_m^1 + U_{kn} x_n^2\right)}}\\
+\frac{\partial h_k^2}{ \partial U_{\alpha\beta}} &=& h_k^2 \left(1 - h_k^2 \right) \left( W_{km} \frac{\partial h_m^1}{\partial U_{\alpha\beta}}+ \delta_{\alpha,k} \delta_{\beta,n} x_n^2 \right) \\
+&=& h_k^2 \left(1 - h_k^2 \right)  W_{km} h_m^1 \left(1 - h_m^1 \right) \delta_{\alpha,m} \delta_{\beta,p} x_p^1 \\
+& & + h_k^2 \left(1 - h_k^2 \right) \delta_{\alpha,k} \delta_{\beta,n} x_n^2 \\
+\frac{\partial h_i^2}{ \partial U_{jk}} &=&
+h_i^2 \left(1 - h_i^2 \right)  W_{ij} h_j^1 \left(1 - h_j^1 \right) x_k^1 + h_i^2 (1-h_i^2) x_k^2 \delta_{i,j}
+\end{aligned}
+$$
+
+So, we can see that at each time step we pick up a term that looks like $$h(1-h)\otimes x$$ and a term from the chain rule multiplying all the past outer derivatives $$h^t(1-h^t)$$ with an earlier $$x$$ term. This has 3 indices, let's simply to our desired derivative so we can see how they all contract.
+
+$$
+\begin{aligned}
+\frac{dL}{d U_{\alpha\beta}} &=& \sum_{i=1}^{D_y} \frac{dL_i}{dU_{\alpha\beta}} \\
+&=& \sum_{i=1}^{D_y} (\tilde{y}_i - y_i) V_{ij} \frac{\partial h_j^t}{ \partial U_{\alpha\beta}}
+\end{aligned}
+$$
+
+for $$t=2$$
+
+$$
+\begin{aligned}
+\frac{dL}{d U_{\alpha\beta}}\bigg|^{t=2} &=& \sum_{i=1}^{D_y}  (\tilde{y}_i - y_i) V_{ij} \frac{\partial h_j^2}{ \partial U_{\alpha\beta}} \\
+&=& \sum_{i=1}^{D_y} (\tilde{y}_i - y_i) V_{i\alpha} \bigg( h_\alpha^2 \left(1 - h_\alpha^2 \right)  W_{\alpha k} h_k^1 \left(1 - h_k^1 \right) x_\beta^1 + h_\alpha^2 (1-h_\alpha^2) x_\beta^2 \bigg)
+\end{aligned}
+$$
+
+This suggests an [algorithm](https://gist.github.com/mcminis1/33238787522303ab12bf036dd8cd1501#file-rnn-py-L125) to compute the derivative:
+
+```
+ds_dU = 0
+h_t = 0
+for t in 1 ... D_x:
+    h_p = h_t \\ needed for the W derivative.
+    h_t = sigma(h_t, x_t)
+    ds = h_t * (1 - h_t)
+    // multiply ds by each row in W
+    ds_W[c] = ds[c] * W[:,c]
+
+    ds_dU = dot(ds_W, ds_dU)
+    ds_dU += outer(ds, x_i)
+
+dy = dot(V, h_t) - y
+dyV = dot(dy, V)
+
+// multiply ds by each row in W
+dL_dU[c] = dyV[c] * ds_dU[:,c]
+```
+An interesting thing we'll come back to later is the gradient of the loss function w.r.t. $$dy$$), this is the only part we need to change for most loss functions we might choose.
+
+I adding in a seemingly extraneous value of $$h$$, namely $$h_p$$, because it will be useful when adding in the $$\bar W$$ derivative. 
+
+## Optimization
+
+Here a plot with are 4 different segments we're predicting using the red line, $$\tilde y$. The green line is the ground truth. This is the progress over 4000 epochs.
+
+![img]({{site.url}}/img/rnn_optimization_40.gif)
+
+You can see it converges relatively quickly to the ground truth, but then starts to wiggle as you over optimize. I think that's partly due to the cost function being pretty soft near $$\Delta y=0$.
+
+
+In the derivation above we assumed $RMSE$ error. However, we're free to choose any loss function we want. If you look at the derivatives of the loss function you'll see a term that looks like $$\Delta y$ which is the leading term in the gradient used to update the parameters in $V$, $W$, and $U$. We could choose any other loss function to optimize, or, to make things a little easier, simply change this gradient term. 
+
+For instance, if you want to use $L^1$ loss, you can change the term to:
+
+$$
+\frac{\partial L_i}{\partial y_i} = \text{sign}(\tilde{y}_j - y_j) 
+$$
+
+For elastic net:
+
+$$
+\frac{\partial L_i}{\partial y_i} = \alpha[\text{sign}(\tilde{y}_i - y_i)] + (1-\alpha)(\tilde{y}_i - y_i)
+$$
+
+Here's a loss function that acts like $L^2$ near zero and $L^1$ away from it (soft near zero and not overly sensitive to outliers).
+
+$$
+\begin{aligned}
+\frac{\partial L_i}{\partial y_i} &= \text{sign}(\tilde{y}_i - y_i) \quad &\forall \quad |(\tilde{y}_i - y_i)| \geq \beta \\
+&= (\tilde{y}_i - y_i) / \beta \quad &\forall \quad |(\tilde{y}_i - y_i)| \lt \beta
+\end{aligned}
+$$
+
+I spent some time tuning the optimization to be more stable. Here's some elastic net action (if it is not looping, open in a new tab to see it evolve over epochs):
+
+![img]({{site.url}}/img/rnn_optimization_elasticnet_0.5.gif)
+
+Ultimately I found the third loss function the best. It was pretty stable and worked fast.
+
+![img]({{site.url}}/img/rnn_optimization.gif)
+
+### Conclusion
+
+The venerable RNN is still a useful machine learning algorithm for time series and natural language problems. Hopefull working through the algorithm in detail, deriving the derivatives, and checking out some optimization approaches helps you build some more intuition for them.
+
+## Footnotes
+1. It's also important to mention, that this algorithm is the basic version of RNNs and there exist different variations of RNNs. For example, Long short-term memory (LSTM) is a type of RNN that uses additional "memory cells" to better retain information over long sequences, it also uses three different gates to control the information flow, while Gated Recurrent Units (GRU) cells reduce the number of gates in LSTM to two.
+
+## Other work
+
+Besides this post here are other good resources for learning about RNNs.
+
+1. A nice [tutorial by JalFaizy Shaikh ](https://www.analyticsvidhya.com/blog/2019/01/fundamentals-deep-learning-recurrent-neural-networks-scratch-python/)
+2. Andrej Karpathy [minimal char RNN](https://gist.github.com/karpathy/d4dee566867f8291f086)
+3. Michel Kiffel [review of the Karpathy code](https://mkffl.github.io/2019/07/08/minimalist-RNN.html)
+4. Andrej Karpathy [The Unreasonable Effectiveness of Recurrent Neural Networks](https://karpathy.github.io/2015/05/21/rnn-effectiveness/)
+5. NVIDIA [Neural Translation with GPUs](https://developer.nvidia.com/blog/introduction-neural-machine-translation-with-gpus/)
+
+
+
