@@ -69,7 +69,7 @@ $$
 L = \frac{1}{2}\sum_{i=1}^{D_y} (\tilde{y}_i - y_i)^2 
 $$
 
-In many introductions to RNN you'll note that the output is usually a single data point. It's either the next character in a char-rnn, or the next data point in a time series one. In this derivation and code we're going to use the more general for so that we could predict any number of data points.
+In many introductions to RNN you'll note that the output is usually a single data point. It's either the next character in a char-rnn, or the next data point in a time series one. In this derivation and code we're going to use the generalized form (multi-dimensional output) so that we can predict any number of data points.
 
 For the activation function $$h(.)$$ we'll use the sigmoid function, $$\sigma$$
 
