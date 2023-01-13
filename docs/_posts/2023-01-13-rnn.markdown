@@ -18,7 +18,7 @@ Modern architectures for large language models (LLMs) such as GPT are built on t
 
 A Recurrent Neural Network (RNN) is a type of neural network that is specifically designed to process sequential data[1]. An RNN can be thought of as a neural network that has a "memory", allowing it to retain information from past inputs. This allows the network to understand context and relationships within a sequence.
 
-Mathematically, an RNN is defined by a set of weight matrices and a recurrent activation function. The weight matrices, usually denoted as $$\bar{U}$$, $$\bar{W}$$, and $$\bar{V}$$, are used to transform the input, hidden state, and output respectively. The recurrent activation function, usually denoted as $h(.)$, is used to update the hidden state at each time step.
+Mathematically, an RNN is defined by a set of weight matrices and a recurrent activation function. The weight matrices, usually denoted as $$\bar{U}$$, $$\bar{W}$$, and $$\bar{V}$$, are used to transform the input, hidden state, and output respectively. The recurrent activation function, usually denoted as $$h(.)$$, is used to update the hidden state at each time step.
 
 The basic algorithm for an RNN can be described as follows:
 
