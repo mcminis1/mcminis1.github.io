@@ -188,7 +188,7 @@ h_i^2 \left(1 - h_i^2 \right)  W_{ij} h_j^1 \left(1 - h_j^1 \right) x_k^1 + h_i^
 \end{aligned}
 $$
 
-So, we can see that at each time step we pick up a term that looks like $$h(1-h)\otimes x$$ and a term from the chain rule multiplying all the past outer derivatives $$h^t(1-h^t)$$ with an earlier $$x$$ term. This has 3 indices, let's simply to our desired derivative so we can see how they all contract.
+So, we can see that at each time step we pick up a term that looks like $$h(1-h)\otimes x$$ and a term from the chain rule multiplying all the past outer derivatives $$h^t(1-h^t)$$ with an earlier $$x$$ term. This has 3 indices, let's plug this derivative back into $$ dL/dU $$ so we can see how they all contract.
 
 $$
 \begin{aligned}
@@ -273,7 +273,7 @@ Ultimately I found the third loss function the best. It was pretty stable and wo
 
 ### Conclusion
 
-The venerable RNN is still a useful machine learning algorithm for time series and natural language problems. Hopefull working through the algorithm in detail, deriving the derivatives, and checking out some optimization approaches helps you build some more intuition for them.
+The Recurrent Neural Network (RNN) remains a valuable tool for solving time series and natural language processing tasks. Understanding the algorithm and optimization techniques through detailed derivations and analysis can aid in developing a deeper intuition for RNNs. Please copy the code and run your own experiments!
 
 ## Footnotes
 1. It's also important to mention, that this algorithm is the basic version of RNNs and there exist different variations of RNNs. For example, Long short-term memory (LSTM) is a type of RNN that uses additional "memory cells" to better retain information over long sequences, it also uses three different gates to control the information flow, while Gated Recurrent Units (GRU) cells reduce the number of gates in LSTM to two.
