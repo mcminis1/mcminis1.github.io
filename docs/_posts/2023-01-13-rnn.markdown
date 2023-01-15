@@ -229,11 +229,13 @@ dL_dU[c] = dyV[c] * ds_dU[:,c]
 ```
 An interesting thing we'll come back to later is the gradient of the loss function w.r.t. $$dy$$), this is the only part we need to change for most loss functions we might choose.
 
-I adding in a seemingly extraneous value of $$h$$, namely $$h_p$$, because it will be useful when adding in the $$\bar W$$ derivative. 
+I added in $$h_p$$ because it will be useful later when computing in the $$\bar W$$ derivative. 
 
 ## Optimization
 
-Here a plot with are 4 different segments we're predicting using the red line, $$\tilde y$. The green line is the ground truth. This is the progress over 4000 epochs.
+The parameters are initiated randomly. I did a little bit of work to minimize the error with initial params, but keep the matrices well ocnditioned. You can see that in the code where I do SVD or QR decompositions. 
+
+Below are plots depicting the RNN predictions converging from their random initial conditions to full optimization, and in some cases a little further. I randomly choose 4 segments to plot (that are _not_ in the trianing set). The red line is our prediction $$\tilde y$ and the green line is the ground truth. This is the progress over 4000 epochs.
 
 ![img]({{site.url}}/img/rnn_optimization_40.gif)
 
@@ -245,20 +247,22 @@ In the derivation above we assumed $RMSE$ error. However, we're free to choose a
 For instance, if you want to use $L^1$ loss, you can change the term to:
 
 $$
-\frac{\partial L_i}{\partial y_i} = \text{sign}(\tilde{y}_j - y_j) 
+\frac{\partial L_i}{\partial y_i} = \text{sgn}(\tilde{y}_j - y_j) 
 $$
+
+where $$\text{sgn}$$ is the [sign function](https://en.wikipedia.org/wiki/Sign_function).
 
 For elastic net:
 
 $$
-\frac{\partial L_i}{\partial y_i} = \alpha[\text{sign}(\tilde{y}_i - y_i)] + (1-\alpha)(\tilde{y}_i - y_i)
+\frac{\partial L_i}{\partial y_i} = \alpha[\text{sgn}(\tilde{y}_i - y_i)] + (1-\alpha)(\tilde{y}_i - y_i)
 $$
 
 Here's a loss function that acts like $L^2$ near zero and $L^1$ away from it (soft near zero and not overly sensitive to outliers).
 
 $$
 \begin{aligned}
-\frac{\partial L_i}{\partial y_i} &= \text{sign}(\tilde{y}_i - y_i) \quad &\forall \quad |(\tilde{y}_i - y_i)| \geq \beta \\
+\frac{\partial L_i}{\partial y_i} &= \text{sgn}(\tilde{y}_i - y_i) \quad &\forall \quad |(\tilde{y}_i - y_i)| \geq \beta \\
 &= (\tilde{y}_i - y_i) / \beta \quad &\forall \quad |(\tilde{y}_i - y_i)| \lt \beta
 \end{aligned}
 $$
