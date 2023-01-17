@@ -195,7 +195,7 @@ The optimization process looks about the same as the numpy code, but takes far l
 
 ## Conclusions
 
-The optimization here is orders of magnitude faster. Writing the code was orders of magnitude faster. Working with libraries like PyTorch feel a bit like cheating.
+The optimization here is orders of magnitude faster. Writing the code was orders of magnitude faster. Working with PyTorch feels a bit like cheating.
 
 # Other references
 
