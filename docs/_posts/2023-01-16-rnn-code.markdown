@@ -109,7 +109,7 @@ You'll recognize the `new_hidden_state` method as the sigmoid function. THis is 
 
 `el_mul` is an element wise multiplication method where you operate a row vector on the rows of a matrix.
 
-`l_grad` is the loss objective we're minimizing. If you wanted to experiment with other loss objectives, this is where you would plug in the gradient to see how they work.
+`l_grad` is the loss objective we're minimizing. If you wanted to experiment with other loss objectives, this is where you would plug in the gradient to see how they work. We're using a version of the Huber loss function.
 
 ### Training data setup
 
