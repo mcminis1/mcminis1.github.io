@@ -55,6 +55,17 @@ $$
 
 where $$(\partial L/\partial h_t)$$ is the gradient of the loss function with respect to the hidden state vector at time step $$t$$, and $$(\partial h_t/\partial U)$$ is the gradient of the hidden state vector with respect to the matrix $$\bar U$$. That final partial derivative might also have a chain rule in it. Similar derivatives for $$W$$ and $$V$$ can be constructed.
 
+The best set of matrix weight parameters are the ones that minimize the loss function. So we compute the loss function and it's gradients and then update the matrix parameters to minimize the loss function. Usually we do something like stochastic gradient descent (SGD) with some algorithmic tweaks to speed up convergence and to make it more stable.
+
+The basic algorithm involves a loop over all of the data to compute the loss gradients and then update the weights using:
+
+$$
+ w^{\text{new}} = w^{\text{old}} - \epsilon \times \frac{dL}{dw}
+$$
+
+where $$\epsilon$$ is some small time step (usually 0.01 or so.). We're moving the direction opposite the gradient so that we're minimizing the loss function. This process is repeated some number of times until the parameters converge.
+
+
 ### An example
 
 All of that is a bit abstract, so let's choose a specific problem to solve, work through the algebra, and implement it in python. You can find the code [here](https://gist.github.com/mcminis1/33238787522303ab12bf036dd8cd1501).
