@@ -8,7 +8,7 @@ regenerate: true
 
 ### LLM Applications
 
-Unlike traditional web development, which focuses on building web pages and applications, LLM application development involves working with natural language prompts and integrating your data sources to create workflows. The LLM provides a natural language interface for your users to provide input and to generate natural language output. However, the LLM is limited. The content that is in it's training set is all it knows. It's the same for all users and isn't very good outside those bounds. 
+Unlike traditional web development, which focuses on building web pages and applications, Large Language Model (LLM) application development involves working with natural language prompts and integrating your data sources to create workflows. The LLM provides a natural language interface for your users to provide input and to generate natural language output. However, the LLM is limited. The content that is in it's training set is all it knows. It's the same for all users and isn't very good outside those bounds. 
 
 If you want to build a differentiated LLM AI product you have to either a) use the model in a novel way (which can then be ripped off) b) bring a new dataset to it and do something more focused/domain specific than the general purpose LLM or c) build integrations on top of it that do useful stuff.
 
