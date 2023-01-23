@@ -191,7 +191,7 @@ The main loop is super simple. Iterate over epochs and then done!
 
 The optimization process looks about the same as the numpy code, but takes far less wall clock time.
 
-![img]({{site.url}}/img/rnn_optimization_pytorch.gif)
+![img]({{site.url}}/img/rnn_optimization/rnn_optimization_pytorch.gif)
 
 ## Conclusions
 

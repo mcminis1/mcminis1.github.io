@@ -286,7 +286,7 @@ This is the step where we update the weights every epoch. Many more sophisticate
 
 Below are plots depicting the RNN predictions converging from their random initial conditions to full optimization, and in some cases a little further. I randomly choose 4 segments to plot (that are _not_ in the training set). The red line is our prediction $$\tilde y$ and the green line is the ground truth. This is the progress over 4000 epochs.
 
-![img]({{site.url}}/img/rnn_optimization_40.gif)
+![img]({{site.url}}/img/rnn_optimization/rnn_optimization_40.gif)
 
 You can see it converges relatively quickly to the ground truth, but then starts to wiggle as you over optimize. I think that's partly due to the cost function being pretty soft near $$\Delta y=0$. As mentioned earlier, we could choose any other loss function to optimize, or, to make things a little easier, simply change this gradient term. 
 
@@ -315,11 +315,11 @@ $$
 
 I spent some time tuning the optimization to be more stable. Here's some elastic net action (if it is not looping, open in a new tab to see it evolve over epochs):
 
-![img]({{site.url}}/img/rnn_optimization_elasticnet_0.5.gif)
+![img]({{site.url}}/img/rnn_optimization/rnn_optimization_elasticnet_0.5.gif)
 
 Ultimately I found the third loss function the best. It was pretty stable and worked fast.
 
-![img]({{site.url}}/img/rnn_optimization.gif)
+![img]({{site.url}}/img/rnn_optimization/rnn_optimization.gif)
 
 ### Conclusion
 
