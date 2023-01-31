@@ -153,11 +153,13 @@ Answer:"""
 # flan-t5-xl
 ![img]({{site.url}}/img/llm_local_experiment/flan-t5-xl_more_prompt_og_order.png)
 
-This one puzzled me. I suspect what is happening here is that my question is very similar to one of the few-shot examples. SO when it reuses the answer, and puts it back into the prompt, that the answer just becomes super important and nothing else comes back.
+This one puzzled me. I suspect what is happening here is that my question is very similar to one of the few-shot examples. So when it reuses the answer, and puts it back into the prompt, that the answer just becomes super important and nothing else comes back.
 
 So, I tried asking in a different order and I got a different result.
 
 ![img]({{site.url}}/img/llm_local_experiment/flan-t5-xl_more_prompt_2_order.png)
+
+I _think_ this might be an overfitting issue since the model was trained, and then fine tuned afterwards.
 
 
 # gpt-J-6B
@@ -173,6 +175,8 @@ Some of the things that I noticed (in no particular order):
 - These local models are nice for some use cases, but aren't ready for a "Deck Chat"-like conversational AI. The main limitation is input token length. To provide the context to give good answers, you can't just pull a model off of the shelf and feed it a few examples. It makes up all kinds of stuff.
 - You can shard models and run in float16 (or even int8) if you want to run a big model on a smaller card. Using the [accelerate framework](https://huggingface.co/docs/accelerate/usage_guides/big_modeling) to do it makes it possible (though I wouldn't call it easy yet).
 - Originally I built the backend on FastAPI, but refactored it to Flask. I don't have enough GPU ram for multiple workers. To really serve multiple workers, I need to think a little more about how to structure the app and what frameworks is right ot run it.
+- Bigger models don't always mean better results. Performance will depend on the task at hand, whether you fine tune, how you write the prompt, and how you do inference.
+
 
 ### Conclusions
 
@@ -192,3 +196,5 @@ Online:
 2. Use context and user question to get a response.
 
 At that point I can reassess whether a smaller model will be sufficient, or I need to use one of the commercial options. It might be worthwhile to look into the commercial options before building this workflow out to see if anything there changes my mind.
+
+These smaller models are interesting in their own right. I think they will be useful for single task problems like sentiment analysis, search/embeddings, and multi-class classification. When combined with a larger LLM, we can optimize the cost/benefit tradeoff. Not everything will need the newest state-of-the-art LLM.
