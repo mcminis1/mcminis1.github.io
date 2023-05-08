@@ -65,7 +65,8 @@ I want to do a deep dive into a single LLM prompt, how we generate the inputs, a
 ### The Prompt
 
 Here is the prompt template:
-```Given an input question, first create a syntactically correct BigQuery query to run. 
+```
+Given an input question, first create a syntactically correct BigQuery query to run. 
 Only use the following table:
 {table_info}
 where the activity is one of these strings: {', '.join(self.activities)}
@@ -88,11 +89,13 @@ Examples:
 Question: {self.user_question}
 BigQuery Statement:
 ```
+
 We pass the prompt template all of the inputs and then get back the string for OpenAI to evaluate.
 
 
 An example of the template with all of the fields filled in is:
-```Given an input question, first create a syntactically correct BigQuery query to run. 
+```
+Given an input question, first create a syntactically correct BigQuery query to run. 
 Only use the following table:
 TABLE activities (
     activity_id     text,
