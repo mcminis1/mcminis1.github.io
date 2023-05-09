@@ -6,61 +6,61 @@ categories: jekyll update
 regenerate: true
 ---
 
-In this blog post I'm going to walk through the code for [baldrick](https://github.com/mcminis1/baldrick), a chatbot for BI.
+In this blog post, I will guide you through the code for [baldrick](https://github.com/mcminis1/baldrick), a chatbot for business intelligence (BI). This article is aimed at anyone interested in building a large language model (LLM) powered application, or those curious about using GPT to write SQL.
 
-Baldrick is a LLM powered chatbot that resides in slack, and queries bigquery for data. It was built from scratch in python Feburary of this year (2023) using GPT-3.5-turbo as its primary LLM backend. We chose to specialize it for the activity schema because I use it pretty regularly for user journey and product analytics at my day job (data science, analytics, engineering consulting).
+Baldrick is an LLM-powered chatbot that resides in Slack and queries BigQuery for data. It was built from scratch in Python using GPT-3.5-turbo as its primary LLM backend. I chose to specialize it for the activity schema, as I regularly use it for user journey and product analytics in my day job (data science, analytics, engineering consulting).
 
 ## The User Experience
 
-We always want to focus on the user experience when building applications. If it's not easy to use, and useful for solving a problem, then it's not worth building.
+When building applications, we should always focus on the user experience. If an application isn't easy to use or helpful in solving a problem, it's not worth creating.
 
-For this use case, the ideal user persona is a business user. This could be someone on the executive team, a sales person, bizdev, anyone who needs to use data to make decisions, but doesn't need to know SQL as a regular part of their job. They spend a lot of time using slack (or another team communication platform) and don't want to add another tool to their day.
+For this use case, the ideal user persona is a business user—someone on the executive team, in sales, business development, or anyone who needs data to make decisions without regularly using SQL. These users often spend a lot of time on Slack (or another team communication platform) and don't want to introduce another tool to their routine.
 
-Their ideal work flow would be to open a slack channel, ask a question (e.g. "How many widgets did we sell last month?" or "When was the last time someone from Acmesoft logged in?" or "Show me a weekly-cohorted retention analysis for my chatbot, Baldrick") and get back a correct answer and explanation of what that answer means.
+Their ideal workflow involves opening a Slack channel, asking a question (e.g., "How many widgets did we sell last month?" or "When was the last time someone from Acmesoft logged in?" or "Show me a weekly-cohorted retention analysis for my chatbot, Baldrick"), and receiving a correct answer accompanied by an explanation of what the answer means.
 
 |![](https://raw.githubusercontent.com/mcminis1/baldrick/main/img/slack_example_1_question.png)|
 |:--:| 
 | *Asking Baldrick a question* |
 
-One concern is that this work flow can feel a bit like magic. If a business user asks a question and gets an answer, how do they know if it is right? You can't just surface the SQL query used to get their answer. Even if they know a little SQL, they may not know the data in the data warehouse well enough to know if every thing is right. Or, they may know where the data comes from and not know enough SQL to understand if the query is formed correctly.
+One concern is that this workflow may feel a bit like magic. If a business user asks a question and gets an answer, how can they verify its correctness? Simply showing the SQL query used to obtain the answer is insufficient. Even if they know some SQL, they might not understand the data in the data warehouse well enough to know if everything is accurate. Or, they might know the data sources but lack sufficient SQL knowledge to discern if the query is formed correctly.
 
-The way we solved this is to take the query plan, explain to the user in natural language how it's going to work, then get the answer and show results inline. Explaining the query in natural language will not allow the user to catch all of the errors, but it should give them enough information to ask other folks and verify that the data sources are correct.
+To address this, we present the query plan, explain its functionality in natural language, obtain the answer, and display the results inline. While explaining the query in natural language may not allow users to catch all errors, it should provide enough information for them to consult others and verify the data sources' accuracy.
+
 
 |![](https://raw.githubusercontent.com/mcminis1/baldrick/main/img/slack_example_1.png)|
 |:--:| 
 | *Baldrick giving you an answer* |
 
-After displaying the answer and explanation, there's a few buttons used for feedback.
+After displaying the answer and explanation, several buttons are available for feedback.
 
 |![](https://raw.githubusercontent.com/mcminis1/baldrick/main/img/slack_example_1_interaction.png)|
 |:--:| 
 | *Baldrick getting feedback for improving the service (RFHL, and in-context learning)* |
 
 
-Perhaps they know sql or they want to open a support ticket. They can 
-view the SQL to copy/pase or inspect it.
+Users can view the SQL to copy, paste, or inspect it, whether they are familiar with SQL or wish to open a support ticket.
 
-They also have the option to thumbs up or thumbs down the results. This feedback is useful for channeling potential support issues to an analyst on the team and for improving the quality of the chatbot. I'll go into the feedback loop later in this post.
+Additionally, users can choose to give a thumbs up or thumbs down on the results. This feedback is useful for directing potential support issues to an analyst on the team and improving the chatbot's quality. I will discuss the feedback loop later in this post.
 
 ## Application Overview
 
-The workflow has several steps:
-1. A slash command in slack sends the user's request to the baldrick backend.
-1. Baldrick acknowledges the command by repeating the query and reassuring the user that he has "a cunning plan".
-1. Next we get all of the relevant activities for the business question. Note that in the activity schema, getting the activity is about the same as getting all of the relevant tables in "normal" data warehouse setups.
-1. Next we get the quey to run. This involves giving the LLM the schema for each of the activities we've identified as being useful and some in-context learning. Using the new user question, we look up similar business question-SQL pairs that have been completed successfully in the past and include them as well in the prompt.
-1. Next we see if the SQL is valid byt running the query through the planner. 
-1. If the SQL fails the query planner, we take a single shot at trying to fix it. We pass the business question, the SQL, and the error to the LLM and ask it to fix the query.
-1. We run the query and get the result.
-1. We pass the business question, query, and result ot the LLM and ask for it to explain the whole things in terms a business user can understand.
-1. Finally we pass the query, explanation, and results back to slack where it is formatted in a pretty text block for folks to see.
-1. [Optional] The user can choose to view the query, and up or down vote the answer. These are implemented using buttons in the slack app. Responses are recorded along with the business question, sql, and some metadata in a database for future use in prompts and for RFHL learning.
+The workflow consists of several steps:
+1. A slash command in Slack sends the user's request to the Baldrick backend.
+1. Baldrick acknowledges the command by repeating the query and reassuring the user that it has "a cunning plan."
+1. We gather all relevant activities for the business question. In the activity schema, obtaining the activity is similar to acquiring all relevant tables in "normal" data warehouse setups.
+1. We obtain the query to run. This involves providing the LLM with the schema for each useful activity and some in-context learning. Using the new user question, we look up similar business question-SQL pairs that have been successfully completed in the past and include them in the prompt.
+1. We check the SQL's validity by running it through the planner.
+1. If the SQL fails the query planner, we attempt to fix it once. We pass the business question, the SQL, and the error to the LLM and ask it to correct the query.
+1. We run the query and obtain the result.
+1. We pass the business question, query, and result to the LLM and ask it to explain everything in terms a business user can understand.
+1. We send the query, explanation, and results back to Slack, where they are formatted in an attractive text block for users to see.
+1. [Optional] The user can choose to view the query and upvote or downvote the answer. These options are implemented using buttons in the Slack app. Responses are recorded alongside the business question, SQL, and some metadata in a database for future use in prompts and for RFHL learning.
 
-The entire app is built on GCP and deployed to a google Cloud Run function. I set up a `workload_identity_provider` so that I could use a github action to securely push the code to google Cloud Build, store it on the Artifact Registry, and then deploy it to Cloud run.
+The entire app is built on GCP and deployed to a Google Cloud Run function. I set up a workload_identity_provider to securely push the code to Google Cloud Build using a GitHub action, store it on the Artifact Registry, and then deploy it to Cloud Run.
 
 ## A Deep Dive Example
 
-I want to do a deep dive into a single LLM prompt, how we generate the inputs, and how we parse the output. I'll use the one whose funciton is generating a SQL query using the activity schemas and some example queries ([github code](https://github.com/mcminis1/baldrick/blob/main/src/prompts.py#L102-L145)).
+I want to provide a detailed examination of a single LLM prompt, focusing on how we generate the inputs and parse the output. I'll use the function responsible for generating an SQL query using the activity schemas and some example queries (GitHub code).
 
 ### The Prompt
 
@@ -90,10 +90,9 @@ Question: {self.user_question}
 BigQuery Statement:
 ```
 
-We pass the prompt template all of the inputs and then get back the string for OpenAI to evaluate.
+We pass the prompt template all of the inputs and then receive the string for OpenAI to evaluate.
 
-
-An example of the template with all of the fields filled in is:
+An example of the template with all fields filled in is:
 ```
 Given an input question, first create a syntactically correct BigQuery query to run. 
 Only use the following table:
@@ -142,54 +141,54 @@ Question: How many sales per pageview have we gotten for the last 5 days?
 BigQuery Statement:
 ```
 
-There are a few things to notice here.
-- The schema in the beginning is reinforced by the examples. So, the LLM has the chance to see the schema and query syntax a few times in the prompt. This seems to help it create better SQL. Without the in-context part, the LLM would generate errors at least 20% of the time. Adding in the examples made it much better.
-- Over time We notices the same kinds of errors popping up. We had to extend the list of errors each time we saw a new one appear. For some of the trickier ones, we really could not get rid of them until we added in the examples.
-- The examples should be formatted exactly the same way as the end of your prompt. This is the best way to get the LLM output to match what you want it to produce.
-- This was created before OpenAI refactored the API to take in a list of messages. Today I'd put the first line into the `system` message along with a little bit more direction about how I wanted it to act.
+There are a few things to notice here:
 
-### Embeddings and similarity
+- The schema at the beginning is reinforced by the examples. The LLM has the opportunity to see the schema and query syntax several times in the prompt, which seems to help it create better SQL. Without the in-context part, the LLM would generate errors at least 20% of the time. Adding the examples significantly improved this.
+- Over time, we noticed the same types of errors appearing. We had to expand the list of errors each time a new one emerged. For some trickier errors, they could not be resolved until we added the examples.
+- The examples should be formatted exactly like the end of your prompt. This is the most effective way to get the LLM output to match your desired output.
+- This was created before OpenAI refactored the API to accept a list of messages. Today, I would include the first line in the system message along with more specific instructions about the desired behavior.
 
-I've experimented with several different embedding libraries, both paid and free. I find that for this application, it made very little difference which one I chose (for other applications it can matter a lot). I chose "sentence-transformers/all-mpnet-base-v1" because it was reasonably fast and seemed to have good evaluation metrics.
+### Embeddings and Similarity
 
-The way the embeddings work:
 
-1. Take the business question and pass it through the sentence_transformer. This gives you back a large vector.
-1. Store the business question and SQL query in a dictionary where the key is the embedding vector.
-1. When a user asks a new question, compute the embedding for that string.
-1. Iterate through the items() in your dictionary and compute the inner product between the new vector and the key, that's the score.
-1. Create a list of tuples where the first element is the score and the second is the dictionary value.
-1. Sort that list in descending order of score and take the top K values.
+I experimented with several different embedding libraries, both paid and free. For this application, the choice made little difference (though it can be significant for other applications). I selected "sentence-transformers/all-mpnet-base-v1" because it was reasonably fast and seemed to have good evaluation metrics.
 
-And, in a nutshell, that's how a vector database works.
+Here's how the embeddings work:
 
-We can change how many examples we want to include. In my experience, a good rule of thumb is to have a few reinforced data points, but always fewer than the number of tokens the larges query might return.
+- Pass the business question through the sentence_transformer, which returns a large vector.
+- Store the business question and SQL query in a dictionary where the key is the embedding vector.
+- When a user asks a new question, compute the embedding for that string.
+- Iterate through the items() in your dictionary and compute the inner product between the new vector and the key to get the score.
+- Create a list of tuples where the first element is the score and the second is the dictionary value.
+- Sort that list in descending order of score and take the top K values.
+
+In essence, this is how a vector database works.
+
+From my experience, it's a good rule of thumb to have a few reinforced data points but always fewer than the number of tokens the largest query might return.
 
 ## A List of Learnings
 
 ### LLM Application
 
-- Latency is your #1 killer. Anytime new data is given to Baldrick, acknowledging it and giving the user a sense of progress is very important. A lot of times folks will abandon the query if it takes too long to compute.
-- Parsing the outputs of prompts usually works. But, since it doesn't always work, you have to have fallback to repair broken data. I explored using the LLM itself as well as more deterministic ways and the jury is still out. Both work sometimes.
-- Running out of tokens for your output results in broken output. It's important to count tokens and make sure you have enough left for your expected return value. I usually try to make sure the input takes less than 75% of my token count.
+- Latency is your #1 challenge. Whenever new data is given to Baldrick, acknowledging it and giving the user a sense of progress is crucial. Users may abandon the query if it takes too long to compute.
+- Parsing the outputs of prompts usually works, but since it doesn't always, you need a fallback to repair broken data. I explored using the LLM itself as well as more deterministic methods, and both sometimes work.
+- Running out of tokens for your output results in broken output. It's important to count tokens and ensure you have enough left for your expected return value. I typically try to make sure the input takes less than 75% of my token count.
 
 ### Using a LLM for Analytics
 
-- Using a LLM for SQL works really well. After implementing the in-context learning part I got basically zero errors for the SQL that got returned.
-- Using the activity schema wasn't a terrible choice. There are no joins, so that's an advantage over other data warehouse strategies. However, it does have a different schema for each of the activity_json entities. SO, the complexity is still there. I imagine this would actually be increased over time since schema management in JSON is pretty poor (in my experience).
-- Over time you're going to have problems migrating fine-tuned or in-context SQL to new schema. Managing that dataset will probably be harder than for dbt or other analytics frameworks since there could be a whole lot of different and weird queries in there.
-- The state of synthetic data creation is sad. There are some tools like faker for making single fields. If you want to go out and create a synthetic dataset for a project like this, good luck! There aren't any tools I've found that make it easy to do that. If you do make somethign with a nice schema and rich set of events, it's not easy to put in real world correlations in it so that your results can be surprising or interesting.
+- Using an LLM for SQL works remarkably well. After implementing the in-context learning part, I received virtually zero errors for the returned SQL.
+- Using the activity schema wasn't a terrible choice. There are no joins, which is an advantage over other data warehouse strategies. However, it does have a different schema for each of the activity_json entities, so the complexity is still present. I imagine this complexity would increase over time since schema management in JSON tends to be pretty poor (in my experience).
+- Over time, you will face problems migrating fine-tuned or in-context SQL to new schemas. Managing that dataset will likely be more challenging than for dbt or other analytics frameworks since there could be numerous different and unusual queries.
+- The state of synthetic data creation is lacking. There are some tools like Faker for creating single fields, but if you want to create a synthetic dataset for a project like this, it's not easy. There aren't any tools that simplify this process, and even if you manage to create something with a nice schema and a rich set of events, introducing real-world correlations to generate surprising or interesting results is difficult.
 
 ### Deployment
 
-- Setting up the workload identity provider took longer than it should. The documentation is not very up to date. After getting it set up, things worked smoothly and are presumably secure. It was a good learnign experience for me, but overkill for this size project.
-- Cloud run is not great for this kind of thing. It takes a long time for the image to start up. Slack has a 3 second response limit. The result is that the user gets an error message at first, and then the messages gets retried and multiple jobs end up running.
-- Pull your sentence_transformer model at build time. Then it'll be baked into the image. When the application starts it will just need to load the model (which is much faster than the initial pull).
+- Setting up the workload identity provider took longer than it should have. The documentation is not very up-to-date. Once set up, things ran smoothly and are presumably secure. It was a valuable learning experience for me, but overkill for this size project.
+- Cloud Run is not ideal for this type of application. The image takes a long time to start up, and Slack has a 3-second response limit. As a result, the user initially receives an error message, and then multiple jobs end up running when the message is retried.
+- Pull your sentence_transformer model at build time so it's baked into the image. When the application starts, it only needs to load the model (which is much faster than the initial pull).
 
 ## Conclusions
 
-I built this project to see if anyone was interested enough to try to get it working, or modify it for their own use. I didn't get much interest from the community, but I did get some interest from other folks working in the space. Over the last few months, I've had 5-10 conversations with early stage technologists and founders about how to build stuff like this, what I found surprising, and where it all is going. 
+I built this project to see if anyone was interested enough to try to get it working or modify it for their own use. While I didn't get much interest from the community, I did receive some interest from others working in the space. Over the last few months, I've had 5-10 conversations with early-stage technologists and founders about how to build things like this, what I found surprising, and where it's all heading.
 
-It's an exciting time to be talking to folks and building new things. It seems like there are limitless possibilities. I hope this article spurred some new thoughts and ideas for your own projects!
-
-
+It's an exciting time to be talking to people and building new things, as there seem to be limitless possibilities. I hope this article sparked new thoughts and ideas for your own projects!

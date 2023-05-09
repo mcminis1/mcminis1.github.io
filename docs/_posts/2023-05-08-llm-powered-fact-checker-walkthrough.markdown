@@ -8,15 +8,15 @@ regenerate: true
 
 I recently built a large language model (LLM) application that I like to call ["The Big Lebowski Fact Checker."](https://yeahwellthatsjustlikeyouropinionman.com/) Although the code isn't public yet, I'll include snippets here to help you understand how it works. Keep in mind that using LLMs isn't fast, and scaling is slow on Google App Engine, so please be patient when checking it out.
 
-Motivation
+## Motivation
 
-I love creating software with character, as I believe it adds an extra dimension to the application. In this case, I chose "The Big Lebowski" as my inspiration. A scene in the movie features The Dude saying, ["Yeah? Well, you know, that's just like, uh, your opinion, man."](https://www.youtube.com/watch?v=j95kNwZw8YY) This inspired me to search for the domain `yeahwellthatsjustlikeyouropinionman.com`, which, unsurprisingly, was available!
+I love creating software with character, as I believe it adds an extra dimension to the application. In this case, I chose "The Big Lebowski". A scene in the movie features The Dude saying, ["Yeah? Well, you know, that's just like, uh, your opinion, man."](https://www.youtube.com/watch?v=j95kNwZw8YY) This inspired me to search for the domain `yeahwellthatsjustlikeyouropinionman.com`, which, unsurprisingly, was available!
 
-My motivation for building this app goes beyond the cool domain name and is threefold. First, there's a lot of press about how bad LLM hallucination is, with LLMs often portrayed as very confident 8-year-olds mansplaining to anyone who dares listen. While I've seen this firsthand, I don't think it's essential. Including "facts" in the prompt and limiting the LLM to use data in the prompt to answer questions does a decent job of eliminating make-believe. Of course, it can still be wrong sometimes, but that's usually due to the prompt and data input.
+My motivation for building this app goes beyond the cool domain name and is threefold. First, there's a lot of press about how bad LLM hallucination is, with LLMs often portrayed as very confident 8-year-olds mansplaining to anyone who dares listen. While I've seen this firsthand, I don't think every LLM application is going to do it. Including "facts" in the prompt and instructing the LLM to only use the data in the prompt to answer questions does a decent job of eliminating make-believe. Of course, it can still be wrong sometimes, but that's usually due to the prompt and data input.
 
 Secondly, this app includes essential components that are important for other apps I might want to build in the future. For example, it can summarize a web page, determine if a statement is supported by a text, and figure out the right web searches to answer a question. I can use these parts for other projects.
 
-Lastly, I considered where LLMs are headed. Around five years ago, large newsrooms employed sports journalists to write previews for sporting events. Now, a small handful of companies use statistics to produce previews for major news outlets. Fact-checking is currently a manual process performed in newsrooms by researchers who are thorough and follow a process. I can envision a future where they have a better suite of tools that allows them to be editors and proofreaders rather than search, summarize, and compare grunts.
+Lastly, I considered where LLMs are headed. Around five years ago, large newsrooms employed sports journalists to write previews for sporting events. Now, a small handful of companies use statistics to produce previews for major news outlets. Fact-checking is currently a manual process performed in newsrooms by researchers who are thorough and follow a process. I can envision a future where they have a better suite of tools that allows them to be editors and proofreaders rather than search, summarize, and compare grunts. Maybe someone will discover this application and find it useful .
 
 ## User Experience
 
@@ -27,13 +27,13 @@ The ideal user for this application is a fact-checker, someone who needs to corr
 |:--:| 
 | *Landing page where user has already entered a statement.* |
 
-After submitting the statement, the backend begins verification. To keep users entertained during the non-trivial latency, a playlist of Big Lebowski clips is provided.
+After submitting the statement, the backend begins the process. To keep users entertained while they wait for a response, a playlist of Big Lebowski clips is provided (enjoy!).
 
 |![img]({{site.url}}/img/fact_checker/landing_page_post_submit.png)|
 |:--:| 
 | *After submitting the fact you get a list of searches and sources.* |
 
-Upon completion, users receive a list of searches and sources, with links to sources and key text elements relevant to the statement. The sources help determine if the statement is true, false, partially true, or unknown, and a verdict is provided along with supporting evidence.
+Upon completion, users receive a list of google searches that will be performed along with the results: links to source documents and key text elements relevant to the statement. These text elements are used to help determine if the statement is true, false, partially true, or unknown. That verdict is provided along with supporting evidence in the final message before resetting the input text box.
 
 |![img]({{site.url}}/img/fact_checker/landing_page_answer.png)|
 |:--:| 
@@ -46,15 +46,26 @@ Here's the flow through the application
 1. When the user lands on the page, a websocket opens and starts sending JSON across the wire.
 
 1. The user submits their statement.
+
 1. Lebowski repeats the statement to ensure it remains visible, as the text block toggles into the YouTube player for in-flight entertainment.
-1. The LLM generates a list of falsifiable statements included in the user's statement. If the LLM can't find any, the reply is, "That's just like, your opinion man." Along with the statements, search terms are suggested for use in a Google custom search engine.
+
+1. The LLM generates a list of falsifiable statements included in the user's statement. If the LLM can't find any, the reply is, "That's just like, your opinion man." Along 
+with the statements, search terms are suggested for use in a Google custom search engine.
+
 1. Lebowski sends a message to the frontend with the statements it will try to verify and the web searches.
+
 1. The web searches are performed, collecting the top 3 hits from a list of several "trustworthy" sites for each search phrase.
+
 1. For each search result, we grab the HTML from the URL and parse out the article text.
+
 1. We compute embeddings for each paragraph of text from the webpage (new line separated) and insert them into a vector database.
+
 1. Once all the paragraphs are inserted into the vector database, we embed the searches and statements and retrieve the top 4 matches for each. These are then deduplicated and stored for use in the LLM later.
+
 1. Lebowski sends the documents and links to the websites from the web search to the UI for your perusal, man.
+
 1. Finally, we use the statements to be verified and the information from the documents in a prompt to determine their truthfulness and the most relevant statements for proving so.
+
 1. The final message is sent to the frontend, and the text box is reset.
 
 ## Information Extraction: Two Implementations
