@@ -151,7 +151,7 @@ There are a few things to notice here:
 ### Embeddings and Similarity
 
 
-I experimented with several different embedding libraries, both paid and free. For this application, the choice made little difference (though it can be significant for other applications). I selected "sentence-transformers/all-mpnet-base-v1" because it was reasonably fast and seemed to have good evaluation metrics.
+I experimented with several different embedding libraries, both paid and free. For this application, the choice made little difference (though it can be significant for other applications). I selected `sentence-transformers/all-mpnet-base-v1` from the [sentence_transformers](https://huggingface.co/sentence-transformers/all-mpnet-base-v1) library because it was reasonably fast and has good evaluation metrics.
 
 Here's how the embeddings work:
 
@@ -165,6 +165,10 @@ Here's how the embeddings work:
 In essence, this is how a vector database works.
 
 From my experience, it's a good rule of thumb to have a few reinforced data points but always fewer than the number of tokens the largest query might return.
+
+## Incorporating Feedback
+
+In this application the most direct method of incorporating feedback is through inclusion of the business questions and SQL queries that have been thumbed up by users. For those queries where the results look correct, we can take the business question, compute it's embedding and then insert it back into the vector database. In the future, if the same or a similar question is asked, the business question and SQL will be used as an example in the prompt.
 
 ## A List of Learnings
 
