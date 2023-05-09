@@ -6,72 +6,68 @@ categories: jekyll update
 regenerate: true
 ---
 
-I recently build a LLM application I like to call [The Big Lebowski Fact Checker](https://yeahwellthatsjustlikeyouropinionman.com/). The code isn't public yet, but I'll include snippets here so you can understand how it works. If you go check it out, be patient please. Using LLMs isn't fast, and scaling is very slow for it on the google app engine.
+I recently built a large language model (LLM) application that I like to call ["The Big Lebowski Fact Checker."](https://yeahwellthatsjustlikeyouropinionman.com/) Although the code isn't public yet, I'll include snippets here to help you understand how it works. Keep in mind that using LLMs isn't fast, and scaling is slow on Google App Engine, so please be patient when checking it out.
 
-## Motivation
+Motivation
 
-I love building software with character. I think it adds an extra dimension to the application. In this case, I chose the big Lebowski. In the move there's a scene where The Dude says ["Yeah? Well, you know, that's just like uh, your opinion, man."](https://www.youtube.com/watch?v=j95kNwZw8YY) Well, that inspired me to search for the domain `yeahwellthatsjustlikeyouropinionman.com` which, you probably would not be surprised, was available!
+I love creating software with character, as I believe it adds an extra dimension to the application. In this case, I chose "The Big Lebowski" as my inspiration. A scene in the movie features The Dude saying, ["Yeah? Well, you know, that's just like, uh, your opinion, man."](https://www.youtube.com/watch?v=j95kNwZw8YY) This inspired me to search for the domain `yeahwellthatsjustlikeyouropinionman.com`, which, unsurprisingly, was available!
 
-Beyond the dope domain name, my motivation for building this app was threefold. The first is that there is a lot of press around how bad LLM hallucination is. LLMs are portrayed as very confident 8 year olds mansplaining to anyone who dares listen. I have seen this firsthand, but don't think it's essential. Including "facts" in the prompt and limiting the LLM to using data in the prompt to answer questions does a pretty good job eliminating make believe. It is certainly wrong in it's conclusion sometimes, but for that the prompt and data that goes into it shares the blame.
+My motivation for building this app goes beyond the cool domain name and is threefold. First, there's a lot of press about how bad LLM hallucination is, with LLMs often portrayed as very confident 8-year-olds mansplaining to anyone who dares listen. While I've seen this firsthand, I don't think it's essential. Including "facts" in the prompt and limiting the LLM to use data in the prompt to answer questions does a decent job of eliminating make-believe. Of course, it can still be wrong sometimes, but that's usually due to the prompt and data input.
 
-The second reason I built this is because it includes some essential pieces that are important for other apps I might want to build in the future. For instance, summarizing a web page, determining if a statement is supported by a text, and figuring out the right web searches to do to answer a question. Those are all parts I can pull out and use for other things.
+Secondly, this app includes essential components that are important for other apps I might want to build in the future. For example, it can summarize a web page, determine if a statement is supported by a text, and figure out the right web searches to answer a question. I can use these parts for other projects.
 
-The last consideration is where LLMs are headed. About 5 years ago there were large newsrooms where sports journalists wrote previews for sporting events. Now there are a small handful of companies that ingest statistics and produce previews for all of the major news outlets. Currently, fact checking is a manual process done in newsrooms by researchers. They have a process and are very thorough. I can imagine a future where they have a better suite of tools to use that allows them to be editors and proofreaders as opposed to search, summarize, and compare grunts.
+Lastly, I considered where LLMs are headed. Around five years ago, large newsrooms employed sports journalists to write previews for sporting events. Now, a small handful of companies use statistics to produce previews for major news outlets. Fact-checking is currently a manual process performed in newsrooms by researchers who are thorough and follow a process. I can envision a future where they have a better suite of tools that allows them to be editors and proofreaders rather than search, summarize, and compare grunts.
 
 ## User Experience
 
-The ideal user for this application is a fact checker. That's someone who has a statement that they need to corroborate or falsify.
+The ideal user for this application is a fact-checker, someone who needs to corroborate or debunk a statement. When a user first visits the site, they are greeted with a retro theme and a text box to enter the statement they want to verify.
 
-When a user first visits they are greeted with a retro theme and text box to enter the statement they want to verify.
 
 |![img]({{site.url}}/img/fact_checker/landing_page_with_fact.png)|
 |:--:| 
 | *Landing page where user has already entered a statement.* |
 
-Once the user submits the statement, the backend starts working on verifying it. Since the latency is non-trivial, I provide a nice playlist of big Lebowski clips for your entertainment. 
+After submitting the statement, the backend begins verification. To keep users entertained during the non-trivial latency, a playlist of Big Lebowski clips is provided.
 
 |![img]({{site.url}}/img/fact_checker/landing_page_post_submit.png)|
 |:--:| 
 | *After submitting the fact you get a list of searches and sources.* |
 
-Links to the sources are returned as well as the key text elements relevant to the statement.
+Upon completion, users receive a list of searches and sources, with links to sources and key text elements relevant to the statement. The sources help determine if the statement is true, false, partially true, or unknown, and a verdict is provided along with supporting evidence.
 
 |![img]({{site.url}}/img/fact_checker/landing_page_answer.png)|
 |:--:| 
 | *The sources are used to determine whether the statement is true, false, partially true, or unknown.* |
 
-Finally, there is a verdict along with the supporting evidence.
-
-
 ## Application Overview
 
 Here's the flow through the application
-1. When the user lands on the page, open a websocket and start sending JSON across the wire.
+
+1. When the user lands on the page, a websocket opens and starts sending JSON across the wire.
+
 1. The user submits their statement.
-1. Lebowski responds by repeating the statement. This is just to make sure the statement stays in the frame because the text block toggles into the youtube player for in-flight entertainment.
-1. Next we use the LLM to get a list of falsifyable statements included in the statement. If the LLM can't find any then the reply is "That's just like, your opinion man." Along with the statements, search terms are suggested for use in a google custom search engine.
-1. Lebowski sends a message to the frontend with what statements it is going to try to verify along with the web searches.
-1. The web searches are performed. For each search phrase we collect the top 3 hits from a list of several "trustworthy" sites.
-1. For each of those search results we grab the html from the url and parse out the article text. 
-1. Each paragraph of text from the webpage (new line separated) we compute it's embedding and insert it into a vector database.
-1. Once we get all of the paragraphs inserted into the vector database, we embed the searches and the statements and retrieve the top 4 matches for each. These are then deduplicated and stored for use in the LLM later.
-1. Lebowski sends the docs and links to the websites from the web search to the UI for your perusal man.
-1. Finally we use the statements you want to verify and the information from the documents in a prompt to determine whether they are true or not, and which of the statements are most relevant for proving so.
-1. That final message is sent to the frontend and the text box is reset.
+1. Lebowski repeats the statement to ensure it remains visible, as the text block toggles into the YouTube player for in-flight entertainment.
+1. The LLM generates a list of falsifiable statements included in the user's statement. If the LLM can't find any, the reply is, "That's just like, your opinion man." Along with the statements, search terms are suggested for use in a Google custom search engine.
+1. Lebowski sends a message to the frontend with the statements it will try to verify and the web searches.
+1. The web searches are performed, collecting the top 3 hits from a list of several "trustworthy" sites for each search phrase.
+1. For each search result, we grab the HTML from the URL and parse out the article text.
+1. We compute embeddings for each paragraph of text from the webpage (new line separated) and insert them into a vector database.
+1. Once all the paragraphs are inserted into the vector database, we embed the searches and statements and retrieve the top 4 matches for each. These are then deduplicated and stored for use in the LLM later.
+1. Lebowski sends the documents and links to the websites from the web search to the UI for your perusal, man.
+1. Finally, we use the statements to be verified and the information from the documents in a prompt to determine their truthfulness and the most relevant statements for proving so.
+1. The final message is sent to the frontend, and the text box is reset.
 
 ## Information Extraction: Two Implementations
 
-One of the steps in this process is extracting all information from a web page that's relevant to the user's statement.
+One of the steps in this process is extracting all relevant information from a web page related to the user's statement. A randomly chosen webpage often contains ads, banners, links, and other irrelevant content. For example, take a look at this [Politifact page](https://www.politifact.com/factchecks/2022/dec/20/joe-biden/despite-his-claim-joe-biden-has-not-visited-afghan/), which includes a header and article along with other items such as donation solicitations, sources, links to other fact checks, and site navigation.
 
-If you randomly choose a webpage, there are probably ads, banners, links, and all kind of irrelevant lard in it. For instance check out [this Politifact page](https://www.politifact.com/factchecks/2022/dec/20/joe-biden/despite-his-claim-joe-biden-has-not-visited-afghan/). When you pull this up you'll see the header and article, but also all of the stuff towards the bottom including donation solicitation, sources, links to other fact checks, links to other parts of the site, copyright notices and other irrelevant stuff. 
+As humans, we can quickly skim through the unimportant content and find the relevant information, but a web scraper can't do that. Creating custom scrapers for every domain is a possibility, but it requires constant updates and building new ones when adding new sources.
 
-As a human we can pretty quickly skim through the crap and find the important stuff. A web scraper can't do that. You might be able to create custom scrapers for every domain you want to scrape, but then you also have to keep them updated and build more new ones when you want to add new sources.
-
-Here I'm going to try two different approaches to extracting the data: use a LLM to summarize and extract the relevant facts or compute embeddings to find the most relevant phrases. I tried the all LLM route first.
+Here, I'll explore two different approaches to extracting the data: using an LLM to summarize and extract relevant facts, or computing embeddings to find the most relevant phrases. I first tried the all-LLM route.
 
 ### LLM only: Summarization Challenge
 
-The pure-LLM route involves getting the webpage html, parsing out the visible text, and passing the entire thing to the LLM in a prompt and asking it to extract the relevant parts.
+The pure-LLM route involves getting the webpage HTML, parsing out the visible text, and passing the entire thing to the LLM in a prompt, asking it to extract the relevant parts.
 
 For reference, this is how we get the visible text using BeautifulSoup:
 ```python
@@ -100,9 +96,9 @@ def get_text_from_url(url: str) -> str:
             visible_texts.append(e_str)
     return visible_texts
 ```
-This works reasonably well. The resulting array of text will contain some longer extraneous material but generally gets rid of a lot of noise. I'll discuss some further refinements that were necessary in the next section.
+This works reasonably well. The resulting array of text will contain some longer extraneous material but generally gets rid of a lot of noise. Further refinements will be discussed in the next section.
 
-Once we have the text we want to parse we pass it to the method that extracts "facts" from the document. We're using GPT-3.5-turbo and splitting the messages into different roles. 
+Once we have the text we want to parse, we pass it to the method that extracts "facts" from the document. We're using GPT-3.5-turbo and splitting the messages into different roles.
 
 Here's an example prompt system message:
 ```python
@@ -142,11 +138,12 @@ ANSWER=NONE
 ANSWER="""
 ```
 
-You might be able to guess the problem here. The page contents are just way too large to fit in the prompt without overflowing the context of the LLM (I do not have access to the 32K version of GPT-4).
+The problem here is that the page contents are too large to fit in the prompt without overflowing the context of the LLM (I do not have access to the 32K version of GPT-4).
 
-So, the workaround I chose here is iterative summarization of chunks and then a deduplication step.
+The workaround chosen is iterative summarization of chunks and then a deduplication step.
 
-You can figure out the number of chunks you're going to need using [tiktoken](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb) and some algebra:
+The number of chunks needed can be figured out using [tiktoken](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb) and some algebra:
+
 ```python
 system_message = {"role": "system", "content": GET_DOCUMENT_FACTS_SYSTEM}
 nl = "\n"
@@ -162,7 +159,7 @@ per_msg_token_limit = 0.75 * MODEL_MAX_TOKENS
 n_chunks = int(n_document_tokens / per_msg_token_limit) + 1
 ```
 
-Now, this is really kind of an estimate because there's a fixed and a variable part to each message. The more accurate version computes the fixed parts of the prompt so you know how many actual tokens you can add to each chunk.
+The more accurate version computes the fixed parts of the prompt, so you know how many actual tokens you can add to each chunk.
 
 ```python
 no_text_doc_facts_prompt = GET_DOCUMENT_FACTS_PROMPT.format(
@@ -174,7 +171,7 @@ allowed_tokens_per_partial_doc = per_msg_token_limit - base_document_tokens
 doc_chunks = chunk_doc_list(document_text, allowed_tokens_per_partial_doc)
 ```
 
-Doing it like that, you get an array of document chunks, and iterate over that to send them. In this prompt, I want to new line separate each of the paragraphs, so I include that in my chunker. Note that I could be overestimating the number of tokens in a given chunk if the '\n' is a part of a bpe after adding to the previous paragraph. This is close enough for me right now.
+Doing it like that, you get an array of document chunks, and iterate over that to send them. In this prompt, I want to newline separate each of the paragraphs, so I include that in my chunker. Note that I could be overestimating the number of tokens in a given chunk if the '\n' is a part of a BPE after adding to the previous paragraph. This is close enough for me right now.
 
 ```python
 nl_tokens = num_tokens_from_string("\n")
@@ -197,9 +194,10 @@ def chunk_doc_list(docs: list[str], max_tokens_per_chunk:int) -> list[str]:
     return chunks
 ```
 
-Doing it this way we split the doc into a bunch of chunks, summarize and extract the relevant info from each one and then re-combine them together. The recombined version can have the ame problem as these individual ones, so I deduplicate and summarize those as well it as well.
+Doing it this way, we split the doc into several chunks, summarize and extract the relevant info from each one and then re-combine them together. The recombined version can have the same problem as these individual ones, so I deduplicate and summarize those as well.
 
 The system message and prompt go like this:
+
 ```python
 DEDUPLICATE_FACTS_SYSTEM = """You are a deduplication API. Take the following list of facts are return a deduplicated and condensed list of facts. The resulting list should be shorter than the original list. Summarize the facts as much as possible. You must reply with valid JSON."""
 DEDUPLICATE_FACTS_PROMPT = """EXAMPLE
@@ -224,20 +222,21 @@ RETURN={{"facts": ["spiders are hairy","cats and dogs are animals and usually ha
 RETURN="""
 ```
 
-Similar to the last one, you have to split it up and do it iteratively to get a small number of facts that can fit into the next set of prompts. You can see that this can turn into a whole lot of LLM calls and a lot of added latency even if you parallelize them.
+Similar to the last one, you have to split it up and do it iteratively to get a small number of facts that can fit into the next set of prompts. This can turn into many LLM calls and a lot of added latency even if you parallelize them.
 
 ### LLM + Vector Database: Parsing Challenge
 
-When using a [vector database](https://gist.github.com/mcminis1/2a2d639932b40d2571c06a3088b4c48c#file-vectordatabase-py) to find the relevant phrases, the html parsing and content extraction parts become much more important. The `sentence_transformers` models are much more sensitive to noise than the GPT model series.
+When using a [vector database](https://gist.github.com/mcminis1/2a2d639932b40d2571c06a3088b4c48c#file-vectordatabase-py) to find the relevant phrases, the HTML parsing and content extraction parts become much more important. The `sentence_transformers` models are much more sensitive to noise than the GPT model series.
 
-Many webpages are off limits to web crawlers and robots. My approach to finding good reference material is probably a grey area, and so I'm not going to go into detail here. If you're really interested, try reaching out to me via linkedin or email.
+Many webpages are off limits to web crawlers and robots. My approach to finding good reference material is probably a grey area, and so I'm not going to go into detail here. If you're really interested, try reaching out to me via LinkedIn or email.
 
 The best library I've found for pulling text out of a website is [trafilatura](https://trafilatura.readthedocs.io/en/latest/)
+
 ```python
 def get_text_from_html(contents_html: str) -> str:
     return trafilatura.extract(contents_html)
 ```
-It's the only one I've seen with a really nice writeup on it's [evaluation metrics](https://trafilatura.readthedocs.io/en/latest/evaluation.html)
+It's the only one I've seen with a really nice writeup on its [evaluation metrics](https://trafilatura.readthedocs.io/en/latest/evaluation.html)
 
 Here's how I filter out the top paragraphs.
 ```python
@@ -269,30 +268,31 @@ def filter_texts(queries: list[str], full_texts: tuple[str, str]) -> dict[str,li
 
     return filtered_map
 ```
-a few notes:
-- I am choosing the top 4 documents for each query across all of the webpages I've scraped. I find that some of the web search results are not really relevant. 
-- The queries are both the statements I'm trying to verify as well as the search terms I passed to google. I find that using both gives me more information to work with.
-- If I were to revisit this I would probably keep the scores and try to do somethign clever with them to further reduce the number of paragraphs returned form the method.
+A few notes:
+
+- I am choosing the top 4 documents for each query across all of the webpages I've scraped. I find that some of the web search results are not really relevant.
+
+- The queries are both the statements I'm trying to verify as well as the search terms I passed to Google. I find that using both gives me more information to work with.
+
+- If I were to revisit this, I would probably keep the scores and try to do something clever with them to further reduce the number of paragraphs returned from the method.
 
 ### Comparison of Methods
 
 In general, the LLM seemed better at identifying the right parts of information and extracting them. However, the cost was too high, both in terms of latency and price. Because it took so long to parse a single long page, I retrieved fewer results. This hurt my accuracy.
 
-The vector database approach worked pretty well and shaved a significant amount of latency off the total execution time. One must be careful for the choice of embedding model, but once that is sorted, it does well enough. As you can see from the two sections above, the vector db approach is actually much simpler.
+The vector database approach worked pretty well and shaved a significant amount of latency off the total execution time. One must be careful about the choice of embedding model, but once that is sorted, it does well enough. As you can see from the two sections above, the vector database approach is much simpler.
 
 It's possible that the improved text extraction from the second approach would reduce the number of LLM calls in the first section. I didn't take the time to carefully check that.
 
-LLM based extraction is abstractive and not extractive. So I can't point to a specific line in the original text where the information came from. LLM + vector DB is extractive, so, if I wanted to, I could construct a deep link back to the article and highlight the line it came from. I think both have their plusses and minuses, but for a fact-checking application, I think it's better to use direct references to the source material.
+LLM-based extraction is abstractive and not extractive, so I can't point to a specific line in the original text where the information came from. LLM + vector database is extractive, so if I wanted to, I could construct a deep link back to the article and highlight the line it came from. Both have their advantages and disadvantages, but for a fact-checking application, direct references to the source material are preferred.
 
 ## GPT-3.5-turbo vs GPT-4
 
-I developed both versions of the app using GPT-3.5-turbo. The day I got to my current stopping point, I gat API access to GPT-4. So, I thought I would try it out as well. My initial reaction to using it as a drop in replacement was "Wow, this is slow!" I've done enough performance tuning to get the relatively fast GPT-3.5 version down to around 20 seconds to complete. Using GPT-4 instead feels like I'm giving all that work back without much to show for it.
-
-Without doing any additional prompt tuning, GPT-4 seemed to be about as accurate as GPT-3.5. In this case, I think it's because of the limitations of working with the in-context data. If I were to go full LLM end-to-end and use GPT-4, I would probably get better results, but the latency could easily reach into the minutes.
+I developed both versions of the app using GPT-3.5-turbo. I received API access to GPT-4 and tried it as a drop-in replacement but found it slow. GPT-4 seemed to be as accurate as GPT-3.5 without additional prompt tuning. However, the latency was much higher, making the performance improvements of GPT-3.5 more attractive.
 
 ## Deployment
 
-This time I deployed to google app engine. Using `gcloud app deploy` it was pretty much a breeze. There was a little bit of work that I had to do to get the custom DNS set up, and https working for both http and ws traffic, but wasn't too bad.
+I deployed the app to Google App Engine using `gcloud app deploy`, which was straightforward. Some work was needed to set up custom DNS and HTTPS for both HTTP and WebSocket traffic.
 
 Here's the app.yaml for the app deployment.
 ```yaml
@@ -316,7 +316,7 @@ runtime_config:
 includes:
   - env_variables.yaml
 ```
-Here I had to split the yaml into 2 parts and add `env_variables.yaml` to `.gitignore` because it has my secret keys in it.
+I had to split the yaml into 2 parts and add `env_variables.yaml` to `.gitignore` because it has my secret keys in it.
 
 ## Lessons Learned
 
@@ -324,17 +324,15 @@ Besides the LLM vs Vector database lessons above, there are a few other notes to
 
 ### Design
 
-- I could have chosen a better theme/persona for the project. My goal was to build a real fact checker. Using a character from a famous movie who is kind of a screwball doesn't really match the tone of what I'm trying to build. The theme might make it easier for folks to want to take a look, but that's a casual interaction. After all, who really smiles when they click a link to see a app that just says true or false. One positive thing about the theme is that folks don't judge the output as harshly as if it were very polished and professional.
+- A more suitable theme/persona for the project could have been chosen. The goal was to create a reliable fact-checker, but using a character from a well-known movie with a humorous tone may not have matched the intended purpose of the app. While the theme might have attracted users, it didn't necessarily encourage them to take the results seriously. On the other hand, the light-hearted theme did help users be less critical of the app's output.
 
-- Latency kills. I know this already from Baldrick, Chat GPT, and the other LLM apps I've built. But, this project required a ton of calls when using the LLM to summarize and extract info from web pages. When looking at the logs for the initial few users I shared it with, many folks never got to a conclusion. They thought it was done before it was even half way though. It took way too much time to get all of the data organized and useful. Adding in intermediate events and comments helped, but still wasn't enough.
-
-- Front end isn't that bad. I used GPT to help with a lot of the CSS, HTML, and JS for the frontend. By the time I was done, I had a much better handle on it all. I think next time, I'll step up to using react instead.
-
-- I'm starting to get enough reps at building these that I'm starting to feel the patterns I want to use. I'll write those up in more detail in a future blog post. In short they are around how to write classes that have a prompt and call the LLM, the execution of lots of async calls, and logging and feedback mechanisms.
+- Latency is a major concern. Previous experiences with LLM apps already highlighted the importance of minimizing latency. In this project, however, the LLM's time-consuming process of summarizing and extracting information from web pages posed a significant challenge. Many users assumed the app had finished before it had even completed half of its tasks. Adding intermediate events and comments improved the situation, but more optimization is needed.
+- Front-end development can be enjoyable. With the help of GPT, I learned to work more effectively with CSS, HTML, and JavaScript. This experience has encouraged me to explore using more advanced frameworks like React in future projects.
+- Recognizing patterns is key. As I continued building LLM apps, they began to identify patterns in designing and structuring them. Some of these patterns involve creating classes with prompts and LLM calls, managing asynchronous calls, and implementing logging and feedback mechanisms. The author plans to share these insights in a future blog post.
 
 
 ## Conclusions
 
-If you go check out the app, take it with a grain of salt. It's pretty under provisioned (this is not a paid service and I'm cheap). It should work reasonably well as a fact checking API, or at least be better than a coin flip.
+Please keep in mind that the app is not production grade. It is under-provisioned due to cost considerations, which affects its performance. Nevertheless, the app can still function as a reasonably effective fact-checking tool, offering more accuracy than a random guess.
 
-I likely won't release the code for a while. It's quite a mess. Hopefully, you have a pretty good idea how it all fits together from the code snippets and outline I gave above. Don't hesitate to connect on linkedin to chat, share your experiences building, or pointing out a bug in my code. I hope you find something interesting and useful in it!
+Releasing the complete code is not planned at the moment, as it is quite disorganized. However, the provided code snippets and outline should offer a general understanding of the app's structure and functionality. I welcome you to connect on LinkedIn to discuss further, share experiences, or report any issues with the code. Hopefully, readers will find something valuable and engaging in this project!
