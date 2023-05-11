@@ -44,7 +44,7 @@ Additionally, users can choose to give a thumbs up or thumbs down on the results
 
 ## Application Overview
 
-|![baldrick dataflow](img/baldrick/baldrick_workflow.png)|
+|![baldrick dataflow](/docs/img/baldrick/baldrick_workflow.png)|
 |:--:| 
 | *Baldrick Data Flow diagram* |
 
