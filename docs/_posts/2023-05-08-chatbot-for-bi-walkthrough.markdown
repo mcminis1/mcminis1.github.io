@@ -44,7 +44,7 @@ Additionally, users can choose to give a thumbs up or thumbs down on the results
 
 ## Application Overview
 
-|![](../img/baldrick/baldrick_workflow.png)|
+|![baldrick dataflow](img/baldrick/baldrick_workflow.png)|
 |:--:| 
 | *Baldrick Data Flow diagram* |
 
@@ -192,7 +192,7 @@ In this application the most direct method of incorporating feedback is through 
 
 ## A List of Learnings
 
-### LLM Application
+### LLM Applications
 
 - Latency is your #1 challenge. Whenever new data is given to Baldrick, acknowledging it and giving the user a sense of progress is crucial. Users may abandon the query if it takes too long to compute.
 - Parsing the outputs of prompts usually works, but since it doesn't always, you need a fallback to repair broken data. I explored using the LLM itself as well as more deterministic methods, and both sometimes work.
