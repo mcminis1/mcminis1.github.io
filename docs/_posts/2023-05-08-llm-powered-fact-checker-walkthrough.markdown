@@ -49,7 +49,7 @@ Upon completion, users receive a list of google searches that will be performed 
 
 Here's the flow through the application
 
-1. When a user firsts visits the page a websocket is opened to stream data back and forth. So that the user can submit their statement.
+1. When a user firsts visits the page a websocket is opened to stream data back and forth. The first data sent over the websocket is when the user submits their statement for fact checking.
 
 1. Lebowski repeats the statement to ensure it remains visible, as the text block toggles into the YouTube player for in-flight entertainment. Because latency can be so bad, I try to minimize it by streaming results from the backend as soon as they're ready.
 
