@@ -78,24 +78,24 @@ With one goal, help accelerate their deployment."
 
 Currently (2023-01-23) dust supports OpenAI, Cohere, and AI21 Studio models.
 
-![img]({{site.url}}/img/llm_review/dust_llm_providers.png)
+![img](/img/llm_review/dust_llm_providers.png)
 
 Currently (2023-01-23) dust only supports a few external data integrations, but has a few planned.
 
-![img]({{site.url}}/img/llm_review/dust_integrations.png)
+![img](/img/llm_review/dust_integrations.png)
 
 # Build
 Dust is a framework that provides a notebook style interface to explore a specification for your LLM chain. It reads kind of like a jupyter notebook [maths example](https://dust.tt/spolu/a/d12ac33169). You can build apps and deploy them to dust.tt and evaluate it via API or in the web app UI. You can generate the app specification (or clone an existing one) using the GUI builder.
 
-![img]({{site.url}}/img/llm_review/dust_blocks.png)
+![img](/img/llm_review/dust_blocks.png)
 
 You can add new sample, training, or testing data manually:
 
-![img]({{site.url}}/img/llm_review/dust_data.png)
+![img](/img/llm_review/dust_data.png)
 
 You can easily review past local or API runs:
 
-![img]({{site.url}}/img/llm_review/dust_runs.png)
+![img](/img/llm_review/dust_runs.png)
 
 Building and deployment seem pretty easy. Iterating seems a bit more manual. If you're looking for something hosted and fairly easy to get started with, this is a good option. It doesn't feel quite ready for production use.
 
@@ -133,7 +133,7 @@ If you're a developer and looking for a library to help you build something, thi
 
 ## GPT-Index
 
-GPT Index. [github.](https://github.com/jerryjliu/gpt_index) [docs.](https://gpt-index.readthedocs.io/en/latest/index.html)
+GPT Index. [github](https://github.com/jerryjliu/gpt_index) [docs.](https://gpt-index.readthedocs.io/en/latest/index.html)
 
 Tagline: "An index created by GPT to organize external information and answer queries!"
 
@@ -165,17 +165,17 @@ Patterns is a startup that started building a data engineering platform to enabl
 
 There is an out of the box OpenAI connector as well as one for Cohere.
 
-![img]({{site.url}}/img/llm_review/patterns_connections.png)
+![img](/img/llm_review/patterns_connections.png)
 
 # Build
 
 You can clone an existing app, or start from scratch.
 
-![img]({{site.url}}/img/llm_review/patterns_new_app.png)
+![img](/img/llm_review/patterns_new_app.png)
 
 The app is defined in code and contains the methods you call as well as the graph object.
 
-![img]({{site.url}}/img/llm_review/patterns_code_graph.png)
+![img](/img/llm_review/patterns_code_graph.png)
 
 Deployment and runs are all handled by the hosted platform.
 
