@@ -44,16 +44,36 @@ Additionally, users can choose to give a thumbs up or thumbs down on the results
 
 ## Application Overview
 
+|![](../img/baldrick/baldrick_workflow.png)|
+|:--:| 
+| *Baldrick Data Flow diagram* |
+
+
+
 The workflow consists of several steps:
-1. A slash command in Slack sends the user's request to the Baldrick backend.
-1. Baldrick acknowledges the command by repeating the query and reassuring the user that it has "a cunning plan."
-1. We gather all relevant activities for the business question. In the activity schema, obtaining the activity is similar to acquiring all relevant tables in "normal" data warehouse setups.
-1. We obtain the query to run. This involves providing the LLM with the schema for each useful activity and some in-context learning. Using the new user question, we look up similar business question-SQL pairs that have been successfully completed in the past and include them in the prompt.
-1. We check the SQL's validity by running it through the planner.
-1. If the SQL fails the query planner, we attempt to fix it once. We pass the business question, the SQL, and the error to the LLM and ask it to correct the query.
+
+1. A slash command in Slack sends the user's request to Baldrick.
+
+1. Baldrick acknowledges the command by sending a message back to Slack. The message repeats the query and reassures the user that it has "a cunning plan." 
+
+1. We gather all relevant activities for the business question from the database. In the activity schema, obtaining the activities is similar to acquiring all relevant tables in "normal" data warehouse schema.
+
+1. We form a prompt with all of the candidate activities and send it to the LLM to choose the ones that are relevant for the business query.
+
+1. Next we get the parts needed for in-context learning (previous examples used to help the LLM know what we're trying to do). We take the business question the user asked and look to see if we've answered similar questions in the past. We find the ones that are most relevant and get the business question and SQL used to answer it.
+
+1. Next we form the prompt explored below. We provide the LLM with the schema for each activity, similar business question-SQL pairs pulled from Baldricks chat history, and the current business question. This prompt returns the SQL query to be used to answer the business question.
+
+1. We check the query validity by running it through the planner. If the plan comes back without an error, the SQL is valid.
+
+1. If the SQL fails the query planner, we attempt to fix it once. We pass the business question, the SQL, and the error to the LLM and ask it to correct the query. If that also fails, then we apologize to the user, log the query, and end the process.
+
 1. We run the query and obtain the result.
-1. We pass the business question, query, and result to the LLM and ask it to explain everything in terms a business user can understand.
-1. We send the query, explanation, and results back to Slack, where they are formatted in an attractive text block for users to see.
+
+1. The next prompt uses the business question, query, and result to explain everything in terms a business user can understand.
+
+1. We send the query, explanation, and results back to Slack, where they are formatted in an attractive text block for users to review.
+
 1. [Optional] The user can choose to view the query and upvote or downvote the answer. These options are implemented using buttons in the Slack app. Responses are recorded alongside the business question, SQL, and some metadata in a database for future use in prompts and for RFHL learning.
 
 The entire app is built on GCP and deployed to a Google Cloud Run function. I set up a workload_identity_provider to securely push the code to Google Cloud Build using a GitHub action, store it on the Artifact Registry, and then deploy it to Cloud Run.
@@ -184,12 +204,6 @@ In this application the most direct method of incorporating feedback is through 
 - Using the activity schema wasn't a terrible choice. There are no joins, which is an advantage over other data warehouse strategies. However, it does have a different schema for each of the activity_json entities, so the complexity is still present. I imagine this complexity would increase over time since schema management in JSON tends to be pretty poor (in my experience).
 - Over time, you will face problems migrating fine-tuned or in-context SQL to new schemas. Managing that dataset will likely be more challenging than for dbt or other analytics frameworks since there could be numerous different and unusual queries.
 - The state of synthetic data creation is lacking. There are some tools like Faker for creating single fields, but if you want to create a synthetic dataset for a project like this, it's not easy. There aren't any tools that simplify this process, and even if you manage to create something with a nice schema and a rich set of events, introducing real-world correlations to generate surprising or interesting results is difficult.
-
-### Deployment
-
-- Setting up the workload identity provider took longer than it should have. The documentation is not very up-to-date. Once set up, things ran smoothly and are presumably secure. It was a valuable learning experience for me, but overkill for this size project.
-- Cloud Run is not ideal for this type of application. The image takes a long time to start up, and Slack has a 3-second response limit. As a result, the user initially receives an error message, and then multiple jobs end up running when the message is retried.
-- Pull your sentence_transformer model at build time so it's baked into the image. When the application starts, it only needs to load the model (which is much faster than the initial pull).
 
 ## Conclusions
 
