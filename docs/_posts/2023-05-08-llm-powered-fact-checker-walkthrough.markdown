@@ -6,11 +6,11 @@ categories: jekyll update
 regenerate: true
 ---
 
-I recently built a large language model (LLM) application that I like to call ["The Big Lebowski Fact Checker."](https://yeahwellthatsjustlikeyouropinionman.com/) Although the code isn't public yet, I'll include snippets here to help you understand how it works. Keep in mind that using LLMs isn't fast, and scaling is slow on Google App Engine, so please be patient when checking it out.
+I recently built a large language model (LLM) application that I like to call ["The Big Lebowski Fact Checker."](https://yeahwellthatsjustlikeyouropinionman.com/) A fact-checker is usually a person or service that checks whether a statement is true. During election cycles we see a lot of fact checkers working to sift through all of the statements politicians make to tell whether they are being honest or misleading. Fact checking is useful in other contexts as well when a person or business makes an claim.
+
+Although the code isn't public yet, I'll include snippets here to help you understand how it works. Keep in mind that using LLMs isn't fast, and scaling is slow on Google App Engine, so please be patient if you go to check it out.
 
 ## Motivation
-
-I love creating software with character, as I believe it adds an extra dimension to the application. In this case, I chose "The Big Lebowski". A scene in the movie features The Dude saying, ["Yeah? Well, you know, that's just like, uh, your opinion, man."](https://www.youtube.com/watch?v=j95kNwZw8YY) This inspired me to search for the domain `yeahwellthatsjustlikeyouropinionman.com`, which, unsurprisingly, was available!
 
 My motivation for building this app goes beyond the cool domain name and is threefold. First, there's a lot of press about how bad LLM hallucination is, with LLMs often portrayed as very confident 8-year-olds mansplaining to anyone who dares listen. While I've seen this firsthand, I don't think every LLM application is going to do it. Including "facts" in the prompt and instructing the LLM to only use the data in the prompt to answer questions does a decent job of eliminating make-believe. Of course, it can still be wrong sometimes, but that's usually due to the prompt and data input.
 
@@ -18,51 +18,54 @@ Secondly, this app includes essential components that are important for other ap
 
 Lastly, I considered where LLMs are headed. Around five years ago, large newsrooms employed sports journalists to write previews for sporting events. Now, a small handful of companies use statistics to produce previews for major news outlets. Fact-checking is currently a manual process performed in newsrooms by researchers who are thorough and follow a process. I can envision a future where they have a better suite of tools that allows them to be editors and proofreaders rather than search, summarize, and compare grunts. Maybe someone will discover this application and find it useful .
 
+I love creating software with character, as I believe it adds an extra dimension to the application. In this case, I chose "The Big Lebowski". A scene in the movie features The Dude saying, ["Yeah? Well, you know, that's just like, uh, your opinion, man."](https://www.youtube.com/watch?v=j95kNwZw8YY) This inspired me to search for the domain `yeahwellthatsjustlikeyouropinionman.com`, which, unsurprisingly, was available!
+
 ## User Experience
 
 The ideal user for this application is a fact-checker, someone who needs to corroborate or debunk a statement. When a user first visits the site, they are greeted with a retro theme and a text box to enter the statement they want to verify.
 
 
-|![img]({{site.url}}/img/fact_checker/landing_page_with_fact.png)|
+|![Landing page](/img/fact_checker/landing_page_with_fact.png)|
 |:--:| 
 | *Landing page where user has already entered a statement.* |
 
 After submitting the statement, the backend begins the process. To keep users entertained while they wait for a response, a playlist of Big Lebowski clips is provided (enjoy!).
 
-|![img]({{site.url}}/img/fact_checker/landing_page_post_submit.png)|
+|![Intermediate output](/img/fact_checker/landing_page_post_submit.png)|
 |:--:| 
 | *After submitting the fact you get a list of searches and sources.* |
 
 Upon completion, users receive a list of google searches that will be performed along with the results: links to source documents and key text elements relevant to the statement. These text elements are used to help determine if the statement is true, false, partially true, or unknown. That verdict is provided along with supporting evidence in the final message before resetting the input text box.
 
-|![img]({{site.url}}/img/fact_checker/landing_page_answer.png)|
+|![Fact checking complete](/img/fact_checker/landing_page_answer.png)|
 |:--:| 
 | *The sources are used to determine whether the statement is true, false, partially true, or unknown.* |
 
 ## Application Overview
 
+|![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)|
+|:--:| 
+| *Lebowski Data Flow diagram* |
+
 Here's the flow through the application
 
-1. When the user lands on the page, a websocket opens and starts sending JSON across the wire.
+1. When a user firsts visits the page a websocket is opened to stream data back and forth. So that the user can submit their statement.
 
-1. The user submits their statement.
+1. Lebowski repeats the statement to ensure it remains visible, as the text block toggles into the YouTube player for in-flight entertainment. Because latency can be so bad, I try to minimize it by streaming results from the backend as soon as they're ready.
 
-1. Lebowski repeats the statement to ensure it remains visible, as the text block toggles into the YouTube player for in-flight entertainment.
-
-1. The LLM generates a list of falsifiable statements included in the user's statement. If the LLM can't find any, the reply is, "That's just like, your opinion man." Along 
-with the statements, search terms are suggested for use in a Google custom search engine.
+1. The first prompt includes the user's statement and some instructions. The LLM tries to figure out if the statement just has a bunch of opinions in it, or if there is something that could be fact-checked. For instance, if you say something like "Hamburgers are the best!", Lebowski will reply "That's just like, your opinion man." I like hamburgers too, but that's really just an opinion and not something we could fact check. The other thing the LLM returns are some google searches we can use to find articles and webpages to help figure out whether the statement is true.
 
 1. Lebowski sends a message to the frontend with the statements it will try to verify and the web searches.
 
 1. The web searches are performed, collecting the top 3 hits from a list of several "trustworthy" sites for each search phrase.
 
-1. For each search result, we grab the HTML from the URL and parse out the article text.
+1. For each search result, we grab the HTML from the URL and parse out the article text. This part can be kind of tricky. There is a lot of extra content on the pages that aren't at all relevant to the research we're trying to perform.
 
-1. We compute embeddings for each paragraph of text from the webpage (new line separated) and insert them into a vector database.
+1. After cleaning the text, we compute embeddings for each paragraph of text from the webpage (new line separated) and insert them into a vector database. In this case, we're not saving the data between searches, so we're using an in-memory database that we'll delete later.
 
-1. Once all the paragraphs are inserted into the vector database, we embed the searches and statements and retrieve the top 4 matches for each. These are then deduplicated and stored for use in the LLM later.
+1. Once all the paragraphs are inserted into the vector database, we embed the searches and statements and retrieve the top 4 matches for each. These are then deduplicated and saved for use in the rest of our prompts.
 
-1. Lebowski sends the documents and links to the websites from the web search to the UI for your perusal, man.
+1. Lebowski sends the documents and links to the websites from the web search to the UI for your perusal, man. At this point, you should be able to read through the results for each page and get a feeling for whether your statement is true or not. If you're interested in how well the vector database information retrieval works (and how well the parser works), you can click on the links, go through the web pages, and see if the selections are indeed the most relevant.
 
 1. Finally, we use the statements to be verified and the information from the documents in a prompt to determine their truthfulness and the most relevant statements for proving so.
 
@@ -237,7 +240,7 @@ Similar to the last one, you have to split it up and do it iteratively to get a 
 
 ### LLM + Vector Database: Parsing Challenge
 
-When using a [vector database](https://gist.github.com/mcminis1/2a2d639932b40d2571c06a3088b4c48c#file-vectordatabase-py) to find the relevant phrases, the HTML parsing and content extraction parts become much more important. The `sentence_transformers` models are much more sensitive to noise than the GPT model series.
+When using a [vector database](https://gist.github.com/mcminis1/2a2d639932b40d2571c06a3088b4c48c#file-vectordatabase-py) to find the relevant phrases, the HTML parsing and content extraction parts become much more important. The `sentence_transformers` models are much more sensitive to noise than the GPT model series. And, by the way, if you're not familiar with what a vector database is, no sweat, you can find an explanation [here](2023-05-11-vector-database.markdown).
 
 Many webpages are off limits to web crawlers and robots. My approach to finding good reference material is probably a grey area, and so I'm not going to go into detail here. If you're really interested, try reaching out to me via LinkedIn or email.
 
@@ -300,46 +303,6 @@ LLM-based extraction is abstractive and not extractive, so I can't point to a sp
 ## GPT-3.5-turbo vs GPT-4
 
 I developed both versions of the app using GPT-3.5-turbo. I received API access to GPT-4 and tried it as a drop-in replacement but found it slow. GPT-4 seemed to be as accurate as GPT-3.5 without additional prompt tuning. However, the latency was much higher, making the performance improvements of GPT-3.5 more attractive.
-
-## Deployment
-
-I deployed the app to Google App Engine using `gcloud app deploy`, which was straightforward. Some work was needed to set up custom DNS and HTTPS for both HTTP and WebSocket traffic.
-
-Here's the app.yaml for the app deployment.
-```yaml
-
-runtime: python
-env: flex
-
-instance_class: F2
-
-entrypoint: uvicorn fact_checker.main:app --host 0.0.0.0 --port $PORT --workers 2
-
-resources:
-  cpu: 2
-  memory_gb: 2.0
-  disk_size_gb: 20
-
-runtime_config:
-  operating_system: "ubuntu22"
-  runtime_version: "3.11"
-
-includes:
-  - env_variables.yaml
-```
-I had to split the yaml into 2 parts and add `env_variables.yaml` to `.gitignore` because it has my secret keys in it.
-
-## Lessons Learned
-
-Besides the LLM vs Vector database lessons above, there are a few other notes to make.
-
-### Design
-
-- A more suitable theme/persona for the project could have been chosen. The goal was to create a reliable fact-checker, but using a character from a well-known movie with a humorous tone may not have matched the intended purpose of the app. While the theme might have attracted users, it didn't necessarily encourage them to take the results seriously. On the other hand, the light-hearted theme did help users be less critical of the app's output.
-
-- Latency is a major concern. Previous experiences with LLM apps already highlighted the importance of minimizing latency. In this project, however, the LLM's time-consuming process of summarizing and extracting information from web pages posed a significant challenge. Many users assumed the app had finished before it had even completed half of its tasks. Adding intermediate events and comments improved the situation, but more optimization is needed.
-- Front-end development can be enjoyable. With the help of GPT, I learned to work more effectively with CSS, HTML, and JavaScript. This experience has encouraged me to explore using more advanced frameworks like React in future projects.
-- Recognizing patterns is key. As I continued building LLM apps, they began to identify patterns in designing and structuring them. Some of these patterns involve creating classes with prompts and LLM calls, managing asynchronous calls, and implementing logging and feedback mechanisms. The author plans to share these insights in a future blog post.
 
 
 ## Conclusions
