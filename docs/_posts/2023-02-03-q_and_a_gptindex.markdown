@@ -247,9 +247,9 @@ Both of these performed equally as well over the queries I had. They are both fa
 
 The data from the hug tells the same story:
 
-![img]({{site.url}}/img/gpt_index/all-mpnet-base-v1.png)
+![img](/img/gpt_index/all-mpnet-base-v1.png)
 
-![img]({{site.url}}/img/gpt_index/multi-qa-mpnet-base-dot-v1.png)
+![img](/img/gpt_index/multi-qa-mpnet-base-dot-v1.png)
 
 Using these models resulted in the same end results for my queries.
 
