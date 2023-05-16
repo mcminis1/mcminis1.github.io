@@ -8,14 +8,14 @@ regenerate: true
 
 Here's my weekly roundup with a few interesting articles, an idea, and what I've been doing!
 
-### Article Roundup
+## Article Roundup
 
-## [Brex's Engineering Guide](https://github.com/brexhq/prompt-engineering):
+### [Brex's Engineering Guide](https://github.com/brexhq/prompt-engineering):
 
 - This guide has a really good explanation from the history to advanced topics. I strongly suggest anyone working on prompts to give it a read.
 - For me, the most interesting part was the [Command Grammars](https://github.com/brexhq/prompt-engineering#command-grammars) section. I haven't played around with these that much yet. I think there are some pretty interesting systems that could be built using them.
 
-## [Transformers Agents](https://huggingface.co/docs/transformers/transformers_agents)
+### [Transformers Agents](https://huggingface.co/docs/transformers/transformers_agents)
 
 > In short, it provides a natural language API on top of transformers: we define a set of curated tools and design an agent to interpret natural language and to use these tools. It is extensible by design; we curated some relevant tools, but we’ll show you how the system can be extended easily to use any tool developed by the community.
 
@@ -33,16 +33,16 @@ Here's my weekly roundup with a few interesting articles, an idea, and what I've
     - Translation: translate the text into a given language (NLLB)
 - It's basically an AI personal assistant in your terminal or jupyter notebook.
 
-## Anthropic: [Introducing 100K Context Windows](https://www.anthropic.com/index/100k-context-windows)
+### Anthropic: [Introducing 100K Context Windows](https://www.anthropic.com/index/100k-context-windows)
 
 - This is a huge leap in context window size. For comparison, GPT-4 has a 8K window and 32K window version. However, the 32K version is in a very restricted beta phase. The only folks I know that have access to it are businesses.
 - This will allow users to include an incredible amount of instructions and context for processing. For instance, you could put an entire small/medium sized code repo into it and get it refactored. You could put an entire book into it and ask questions over the entire text (book reports are so outdated).
 - It _might_ be a death blow to vector databases. Vector databases have been very useful for including targeted context for LLM prompts. If you can just paste all the context you have, why filter it out using a vector database first?
 
 
-### What I've been up to
+## What I've been up to
 
-## Explorations in Language: Verb Frames
+### Explorations in Language: Verb Frames
 
 Last week, I had a great discussion about a linguistic concept known as 'verb frames.' To put it simply, a verb frame provides a structured method to dissect a sentence into its basic components. This technique allows for a more profound understanding of language and sentence construction.
 
