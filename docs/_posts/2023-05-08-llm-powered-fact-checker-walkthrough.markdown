@@ -240,7 +240,7 @@ Similar to the last one, you have to split it up and do it iteratively to get a 
 
 ### LLM + Vector Database: Parsing Challenge
 
-When using a [vector database](https://gist.github.com/mcminis1/2a2d639932b40d2571c06a3088b4c48c#file-vectordatabase-py) to find the relevant phrases, the HTML parsing and content extraction parts become much more important. The `sentence_transformers` models are much more sensitive to noise than the GPT model series. And, by the way, if you're not familiar with what a vector database is, no sweat, you can find an explanation [here](2023-05-11-vector-database.markdown).
+When using a [vector database](https://gist.github.com/mcminis1/2a2d639932b40d2571c06a3088b4c48c#file-vectordatabase-py) to find the relevant phrases, the HTML parsing and content extraction parts become much more important. The `sentence_transformers` models are much more sensitive to noise than the GPT model series. And, by the way, if you're not familiar with what a vector database is, no sweat, you can find an explanation [here](https://www.pinecone.io/learn/vector-database/).
 
 Many webpages are off limits to web crawlers and robots. My approach to finding good reference material is probably a grey area, and so I'm not going to go into detail here. If you're really interested, try reaching out to me via LinkedIn or email.
 
