@@ -6,6 +6,8 @@ categories: jekyll update
 regenerate: true
 ---
 
+[*Sign up for notifications and articles!*](https://buttondown.email/jmcminis)
+
 Here's my weekly roundup with a few interesting articles, an idea, and what I've been doing!
 
 ## Article Roundup
