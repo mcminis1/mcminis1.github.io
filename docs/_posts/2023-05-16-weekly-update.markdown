@@ -6,9 +6,9 @@ categories: jekyll update
 regenerate: true
 ---
 
-Here's my weekly roundup!
+Here's my weekly roundup with a few interesting articles, an idea, and what I've been doing!
 
-# Article Roundup
+### Article Roundup
 
 ## [Brex's Engineering Guide](https://github.com/brexhq/prompt-engineering):
 
@@ -40,7 +40,7 @@ Here's my weekly roundup!
 - It _might_ be a death blow to vector databases. Vector databases have been very useful for including targeted context for LLM prompts. If you can just paste all the context you have, why filter it out using a vector database first?
 
 
-# What I've been up to
+### What I've been up to
 
 ## Explorations in Language: Verb Frames
 
@@ -48,7 +48,7 @@ Last week, I had a great discussion about a linguistic concept known as 'verb fr
 
 When we delve into a sentence using verb frames, we assign different roles to various parts of the sentence. These roles are referred to as 'Thematic Roles.' Each thematic role contributes to the overall meaning of the sentence. A comprehensive list of these roles and example classes that employ them can be found in [Table 2](https://verbs.colorado.edu/~mpalmer/projects/verbnet.html).
 
-### A Verb Frame Example
+# A Verb Frame Example
 
 Let's take a look at a simple sentence to illustrate the application of verb frames. Consider the sentence: "John gave Mary a book."
 
@@ -62,7 +62,7 @@ Here, 'V' stands for the verb, which in our case is "gave". This simple represen
 
 You can find several examples [here](https://verbs.colorado.edu/verb-index/vn/hit-18.1.php).
 
-### A Thought: Verb Frame and Sentence Embeddings
+# A Thought: Verb Frame and Sentence Embeddings
 
 Sentence embeddings are mathematical representations of sentences. These representations are often created so that similar sentences map to similar points in a multi-dimensional space. This is essentially like translating the sentence from a linguistic form into a numerical form.
 
