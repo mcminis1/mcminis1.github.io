@@ -74,7 +74,7 @@ With verb frames, we can provide structural information that further enriches th
 
 ## Many Thanks
 
-I want ot thank everyone that gave me feedback on the fact checker blog post. I have not incorporated it all yet, but have been slowly working through it.
+I want to thank everyone that gave me feedback on the [fact checker blog post](/_posts/2023-05-08-llm-powered-fact-checker-walkthrough.markdown). I have not incorporated it all yet, but have been slowly working through it.
 
 ## Sneak Peak: Knowledge Platform
 
