@@ -38,16 +38,15 @@ After submitting the statement, the backend begins the process. To keep users en
 Upon completion, users receive a list of google searches that will be performed along with the results: links to source documents and key text elements relevant to the statement. These text elements are used to help determine if the statement is true, false, partially true, or unknown. That verdict is provided along with supporting evidence in the final message before resetting the input text box.
 
 <!-- |![Fact checking complete](/img/fact_checker/landing_page_answer.png)| -->
-|[![Fact checking complete](/img/fact_checker/landing_page_answer.png)](/img/fact_checker/landing_page_answer.png){:target="_blank"}
+[![Fact checking complete](/img/fact_checker/landing_page_answer.png)](/img/fact_checker/landing_page_answer.png){:target="_blank"}
 *The sources are used to determine whether the statement is true, false, partially true, or unknown.*
 
 ## Application Overview
 
 <!-- |![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)| -->
 [![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)](/img/fact_checker/fact_checker_diagram.png){:target="_blank"}
-*Lebowski Data Flow diagram*
 
-Here's the flow through the application
+We're solving this problem using a Retrieval Augmented Generation ([RAG](https://aws.amazon.com/blogs/machine-learning/question-answering-using-retrieval-augmented-generation-with-foundation-models-in-amazon-sagemaker-jumpstart/)) process with LLMs and custom prompts. The diagram above demonstrates the flow of information through the application, and detailed steps are listed below.
 
 1. When a user first visits the page a websocket is opened to stream data back and forth. The first data sent over the websocket is when the user submits their statement for fact checking.
 
@@ -70,9 +69,6 @@ Here's the flow through the application
 1. Finally, we use the statements to be verified and the information from the documents in a prompt to determine their truthfulness and the most relevant statements for proving so.
 
 1. The final message is sent to the frontend, and the text box is reset.
-
-You can see from the flow of information through the application above that we're solving this problem using a Retrieval Augmented Generation ([RAG](https://aws.amazon.com/blogs/machine-learning/question-answering-using-retrieval-augmented-generation-with-foundation-models-in-amazon-sagemaker-jumpstart/)) process with LLMs.
-
 
 ## Information Extraction: Two Implementations
 
