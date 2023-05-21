@@ -51,7 +51,7 @@ While AI can code autonomously, its process might not mirror that of a seasoned 
 
 A process, or a series of structured tasks, can enable the AI to approach senior developer-level proficiency. You can create synthetic personas (product manager, architect, senior developer, junior developer) and coordinate prompts that gradually plan the work, define the architecture, plan and outline development tasks, and finally, write and assemble the code. This approach aligns with [Chain-of-Thought (CoT) prompting](https://www.promptingguide.ai/techniques/cot), and significantly improves the chances of success for complex tasks.
 
-For complex tasks, the probability of overall success decreases exponentially as the number of tasks increases ( $$ \( P_{success} \)^{n_{tasks}} $$). Hence, improving the success rate of each step is crucial. Structured tasks that can be composed aid in increasing the chances of success.
+For complex tasks, the probability of overall success decreases exponentially as the number of tasks increases, $$ P_{success^{n_{tasks}} $$. Hence, improving the success rate of each step is crucial. Structured tasks that can be composed aid in increasing the chances of success.
 
 
 [Chain-of-Thought (CoT) prompting](). You can greatly improve the chances of success for complex processes by providing a structure to the AI on how to think about solving the problem.
