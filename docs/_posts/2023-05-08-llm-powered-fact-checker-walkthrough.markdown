@@ -44,7 +44,7 @@ Upon completion, users receive a list of google searches that will be performed 
 ## Application Overview
 
 <!-- |![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)| -->
-[![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)](/img/fact_checker/fact_checker_diagram.png){:target="_blank"}
+[![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)](/img/fact_checker/fact_checker_diagram.png){:target="_blank" :style="display:block; margin-left:auto; margin-right:auto"}
 
 We're solving this problem using a Retrieval Augmented Generation ([RAG](https://aws.amazon.com/blogs/machine-learning/question-answering-using-retrieval-augmented-generation-with-foundation-models-in-amazon-sagemaker-jumpstart/)) process with LLMs and custom prompts. The diagram above demonstrates the flow of information through the application, and detailed steps are listed below.
 
