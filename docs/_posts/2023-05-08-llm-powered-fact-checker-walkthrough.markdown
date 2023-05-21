@@ -12,9 +12,9 @@ Although the code isn't public yet, I'll include snippets here to help you under
 
 ## Motivation
 
-My motivation for building this app goes beyond the cool domain name and is threefold. First, there's a lot of press about how bad LLM hallucination is, with LLMs often portrayed as very confident 8-year-olds mansplaining to anyone who dares listen. While I've seen this firsthand, I don't think every LLM application is going to do it. Including "facts" in the prompt and instructing the LLM to only use the data in the prompt to answer questions does a decent job of eliminating make-believe. Of course, it can still be wrong sometimes, but that's usually due to the prompt and data input.
+My motivation for building this app goes beyond the cool domain name and is threefold. First, there's a lot of press about how bad LLM hallucination is, with LLMs often portrayed as very confident 8-year-olds mansplaining to anyone who dares listen. While I've seen this firsthand, it can be prevented. Including "facts" in the prompt and instructing the LLM to only use the data in the prompt to answer questions does a decent job of eliminating make-believe. Of course, it can still be wrong sometimes, but that's usually due to the prompt and data input.
 
-Secondly, this app includes essential components that are important for other apps I might want to build in the future. For example, it can summarize a web page, determine if a statement is supported by a text, and figure out the right web searches to answer a question. I can use these parts for other projects.
+Secondly, this app includes core components that are important for building LLM apps. If you wanted to get started as fast as possible then Python libraries like [LangChain](https://python.langchain.com/en/latest/index.html) and [LlamaIndex](https://gpt-index.readthedocs.io/en/latest/) provide off the shelf implementations for web search, text extraction, and summarization. Since I learn best by doing, I wanted to write my own versions of those components as well as a simple in-memory vector database.
 
 Lastly, I considered where LLMs are headed. Around five years ago, large newsrooms employed sports journalists to write previews for sporting events. Now, a small handful of companies use statistics to produce previews for major news outlets. Fact-checking is currently a manual process performed in newsrooms by researchers who are thorough and follow a process. I can envision a future where they have a better suite of tools that allows them to be editors and proofreaders rather than search, summarize, and compare grunts. Maybe someone will discover this application and find it useful .
 
@@ -49,7 +49,7 @@ Upon completion, users receive a list of google searches that will be performed 
 
 Here's the flow through the application
 
-1. When a user firsts visits the page a websocket is opened to stream data back and forth. The first data sent over the websocket is when the user submits their statement for fact checking.
+1. When a user first visits the page a websocket is opened to stream data back and forth. The first data sent over the websocket is when the user submits their statement for fact checking.
 
 1. Lebowski repeats the statement to ensure it remains visible, as the text block toggles into the YouTube player for in-flight entertainment. Because latency can be so bad, I try to minimize it by streaming results from the backend as soon as they're ready.
 
@@ -70,6 +70,9 @@ Here's the flow through the application
 1. Finally, we use the statements to be verified and the information from the documents in a prompt to determine their truthfulness and the most relevant statements for proving so.
 
 1. The final message is sent to the frontend, and the text box is reset.
+
+You can see from the flow of information through the application above that we're solving this problem using a Retrieval Augmented Generation ([RAG](https://aws.amazon.com/blogs/machine-learning/question-answering-using-retrieval-augmented-generation-with-foundation-models-in-amazon-sagemaker-jumpstart/)) process with LLMs.
+
 
 ## Information Extraction: Two Implementations
 
@@ -152,11 +155,9 @@ ANSWER=NONE
 ANSWER="""
 ```
 
-The problem here is that the page contents are too large to fit in the prompt without overflowing the context of the LLM (I do not have access to the 32K version of GPT-4).
+The problem here is that the page contents are too large to fit in the prompt without overflowing the context of the LLM (I do not have access to the 32K version of GPT-4). Langchain and other libraries provide a default implementation for this that do chunking with overlaps. I chose a slightly different strategy where I split the text into paragraph chunks and poerformed an iterative summarization on those chunks and then combined and deduplicated them in the end.
 
-The workaround chosen is iterative summarization of chunks and then a deduplication step.
-
-The number of chunks needed can be figured out using [tiktoken](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb) and some algebra:
+The number of chunks needed can be figured out using [tiktoken](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb) (tiktoken is the library OpenAI uses to compute the base pair embeddings (BPE) for sentences by converting words into indices) and some algebra:
 
 ```python
 system_message = {"role": "system", "content": GET_DOCUMENT_FACTS_SYSTEM}
@@ -240,9 +241,9 @@ Similar to the last one, you have to split it up and do it iteratively to get a 
 
 ### LLM + Vector Database: Parsing Challenge
 
-When using a [vector database](https://gist.github.com/mcminis1/2a2d639932b40d2571c06a3088b4c48c#file-vectordatabase-py) to find the relevant phrases, the HTML parsing and content extraction parts become much more important. The `sentence_transformers` models are much more sensitive to noise than the GPT model series. And, by the way, if you're not familiar with what a vector database is, no sweat, you can find an explanation [here](https://www.pinecone.io/learn/vector-database/).
+When using a [vector database](https://gist.github.com/mcminis1/2a2d639932b40d2571c06a3088b4c48c#file-vectordatabase-py) to find the relevant phrases, the HTML parsing and content extraction parts become much more important. The `sentence_transformers` models from huggingface (and sentence embeddings in general) are much more sensitive truncated sentences than than the GPT LLM series. These sentence embedding models are trained to take a sentance and translate it into a sparse vector space based on meaning. If a sentence is truncated or malformed, it might lack meaning and the embedding model will struggle to map it to a vector in a meaningful way. Meanwhile, a LLM doing summarization can just kind of ignore or guess at bad text and include the parts it does understand. By the way, if you're not familiar with what a vector database is, no sweat, you can find a pretty good explanation [here](https://www.pinecone.io/learn/vector-database/).
 
-Many webpages are off limits to web crawlers and robots. My approach to finding good reference material is probably a grey area, and so I'm not going to go into detail here. If you're really interested, try reaching out to me via LinkedIn or email.
+Many webpages are off limits to web crawlers and robots. My approach to finding good reference material is probably a grey area, and so I'm not going to go into detail here. If you're really interested, try reaching out to me via LinkedIn or email. It involves generating cookies on my machine and then trying to use those when scraping.
 
 The best library I've found for pulling text out of a website is [trafilatura](https://trafilatura.readthedocs.io/en/latest/)
 
@@ -294,11 +295,11 @@ A few notes:
 
 In general, the LLM seemed better at identifying the right parts of information and extracting them. However, the cost was too high, both in terms of latency and price. Because it took so long to parse a single long page, I retrieved fewer results. This hurt my accuracy.
 
-The vector database approach worked pretty well and shaved a significant amount of latency off the total execution time. One must be careful about the choice of embedding model, but once that is sorted, it does well enough. As you can see from the two sections above, the vector database approach is much simpler.
+The vector database approach worked pretty well and shaved a significant amount of latency off the total execution time. One must be careful about the choice of embedding model (I tried a few from the HuggingFace repo using sentence_embeddings and found ''), but once that is sorted, it does well enough. As you can see from the two sections above, the vector database approach is much simpler.
 
 It's possible that the improved text extraction from the second approach would reduce the number of LLM calls in the first section. I didn't take the time to carefully check that.
 
-LLM-based extraction is abstractive and not extractive, so I can't point to a specific line in the original text where the information came from. LLM + vector database is extractive, so if I wanted to, I could construct a deep link back to the article and highlight the line it came from. Both have their advantages and disadvantages, but for a fact-checking application, direct references to the source material are preferred.
+LLM-based extraction is abstractive and not extractive. If it were extractive, then all of the lines in summary would also be lines from the original source. However, with abstractive summarization, I can't point to a specific line in the original text where the information came from. LLM + vector database is extractive, so if I wanted to, I could construct a deep link back to the article and highlight the line it came from. Both have their advantages and disadvantages, but for a fact-checking application, direct references to the source material are preferred.
 
 ## GPT-3.5-turbo vs GPT-4
 
