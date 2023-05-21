@@ -6,6 +6,9 @@ categories: jekyll update
 regenerate: true
 ---
 
+[*Sign up for notifications and articles!*](https://buttondown.email/jmcminis)
+
+
 I recently built a large language model (LLM) application that I like to call ["The Big Lebowski Fact Checker."](https://yeahwellthatsjustlikeyouropinionman.com/) A fact-checker is usually a person or service that checks whether a statement is true. During election cycles we see a lot of fact checkers working to sift through all of the statements politicians make to tell whether they are being honest or misleading. Fact checking is useful in other contexts as well when a person or business makes an claim.
 
 Although the code isn't public yet, I'll include snippets here to help you understand how it works. Keep in mind that using LLMs isn't fast, and scaling is slow on Google App Engine, so please be patient if you go to check it out.
