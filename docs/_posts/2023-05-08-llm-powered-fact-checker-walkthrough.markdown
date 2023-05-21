@@ -25,25 +25,29 @@ I love creating software with character, as I believe it adds an extra dimension
 The ideal user for this application is a fact-checker, someone who needs to corroborate or debunk a statement. When a user first visits the site, they are greeted with a retro theme and a text box to enter the statement they want to verify.
 
 
-|![Landing page](/img/fact_checker/landing_page_with_fact.png)|
+<!-- |![Landing page](/img/fact_checker/landing_page_with_fact.png)| -->
+|[![Landing page](/img/fact_checker/landing_page_with_fact.png)](/img/fact_checker/landing_page_with_fact.png){:target="_blank"}|
 |:--:| 
 | *Landing page where user has already entered a statement.* |
 
 After submitting the statement, the backend begins the process. To keep users entertained while they wait for a response, a playlist of Big Lebowski clips is provided (enjoy!).
 
-|![Intermediate output](/img/fact_checker/landing_page_post_submit.png)|
+<!-- |![Intermediate output](/img/fact_checker/landing_page_post_submit.png)| -->
+|[![Intermediate output](/img/fact_checker/landing_page_post_submit.png)](/img/fact_checker/landing_page_post_submit.png){:target="_blank"}|
 |:--:| 
 | *After submitting the fact you get a list of searches and sources.* |
 
 Upon completion, users receive a list of google searches that will be performed along with the results: links to source documents and key text elements relevant to the statement. These text elements are used to help determine if the statement is true, false, partially true, or unknown. That verdict is provided along with supporting evidence in the final message before resetting the input text box.
 
-|![Fact checking complete](/img/fact_checker/landing_page_answer.png)|
+<!-- |![Fact checking complete](/img/fact_checker/landing_page_answer.png)| -->
+|[![Fact checking complete](/img/fact_checker/landing_page_answer.png)](/img/fact_checker/landing_page_answer.png){:target="_blank"}|
 |:--:| 
 | *The sources are used to determine whether the statement is true, false, partially true, or unknown.* |
 
 ## Application Overview
 
-|![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)|
+<!-- |![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)| -->
+|[![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)](/img/fact_checker/fact_checker_diagram.png){:target="_blank"}|
 |:--:| 
 | *Lebowski Data Flow diagram* |
 
