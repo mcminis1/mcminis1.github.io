@@ -26,26 +26,26 @@ The ideal user for this application is a fact-checker, someone who needs to corr
 
 
 <!-- |![Landing page](/img/fact_checker/landing_page_with_fact.png)| -->
-|[![Landing page](/img/fact_checker/landing_page_with_fact.png)](/img/fact_checker/landing_page_with_fact.png){:target="_blank"}|
-| *Landing page where user has already entered a statement.* |
+[![Landing page](/img/fact_checker/landing_page_with_fact.png)](/img/fact_checker/landing_page_with_fact.png){:target="_blank"}
+*Landing page where user has already entered a statement.*
 
 After submitting the statement, the backend begins the process. To keep users entertained while they wait for a response, a playlist of Big Lebowski clips is provided (enjoy!).
 
 <!-- |![Intermediate output](/img/fact_checker/landing_page_post_submit.png)| -->
-|[![Intermediate output](/img/fact_checker/landing_page_post_submit.png)](/img/fact_checker/landing_page_post_submit.png){:target="_blank"}|
-| *After submitting the fact you get a list of searches and sources.* |
+[![Intermediate output](/img/fact_checker/landing_page_post_submit.png)](/img/fact_checker/landing_page_post_submit.png){:target="_blank"}
+*After submitting the fact you get a list of searches and sources.*
 
 Upon completion, users receive a list of google searches that will be performed along with the results: links to source documents and key text elements relevant to the statement. These text elements are used to help determine if the statement is true, false, partially true, or unknown. That verdict is provided along with supporting evidence in the final message before resetting the input text box.
 
 <!-- |![Fact checking complete](/img/fact_checker/landing_page_answer.png)| -->
-|[![Fact checking complete](/img/fact_checker/landing_page_answer.png)](/img/fact_checker/landing_page_answer.png){:target="_blank"}|
-| *The sources are used to determine whether the statement is true, false, partially true, or unknown.* |
+|[![Fact checking complete](/img/fact_checker/landing_page_answer.png)](/img/fact_checker/landing_page_answer.png){:target="_blank"}
+*The sources are used to determine whether the statement is true, false, partially true, or unknown.*
 
 ## Application Overview
 
 <!-- |![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)| -->
-|[![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)](/img/fact_checker/fact_checker_diagram.png){:target="_blank"}|
-| *Lebowski Data Flow diagram* |
+[![Fact Checker dataflow](/img/fact_checker/fact_checker_diagram.png)](/img/fact_checker/fact_checker_diagram.png){:target="_blank"}
+*Lebowski Data Flow diagram*
 
 Here's the flow through the application
 
