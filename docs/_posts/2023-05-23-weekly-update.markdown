@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "2023-05-23 Weekly Update"
-date:   2023-05-23 00:00:00 -0500
+date:   2023-05-22 00:00:00 -0500
 categories: jekyll update
 regenerate: true
 ---
