@@ -53,9 +53,6 @@ A process, or a series of structured tasks, can enable the AI to approach senior
 
 For complex tasks, the probability of overall success decreases exponentially as the number of tasks increases, $$(P_{success})^{N_{tasks}}$$. For example, if you have a series of tasks that work 90% of the time, it only takes 7 steps so that the overall chances of success are less than a coin flip! Hence, improving the success rate of each step is crucial. Structured tasks that can be composed aid in increasing the chances of success.
 
-
-[Chain-of-Thought (CoT) prompting](). You can greatly improve the chances of success for complex processes by providing a structure to the AI on how to think about solving the problem.
-
 # Plugins
 
 At its core, AI is essentially a text API, receiving and returning text. Plugins serve as bridges, connecting the AI with real-world applications, data sources, and tools. Although AI can write its own code to expand its functionality, the complexity of these tasks could hamper your success rate. Preemptively planning how resources will be accessed and utilized can help streamline the process.
