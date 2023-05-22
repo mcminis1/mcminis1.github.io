@@ -24,7 +24,6 @@ this approach. Primarily, the mental effort in constructing such examples is sig
 scale up.
 ```
 
-
 ### Unraveling the Research Paper
 
 The research team meticulously assembled approximately 1000 high-quality prompt-response pairs. Here's an illustrative example:
@@ -73,7 +72,7 @@ The next step involved fine-tuning a Large Language Model (LLaMa-65B), which was
 
 *In comparison to commercial and large open-source language models, Lima demonstrates commendable performance.*
 
-### Discussion and Implications
+### Discussion + Implications
 
 This research paper is particularly intriguing as it demonstrates that just a few hundred to a thousand well-curated prompts can substantially enhance a large language model's performance, making it competitive with the best commercial offerings. Although the model's maximum potential is determined by the pre-training phase, an excellent user experience within a specific domain can be achieved with a set of well-crafted prompts. It dispenses with the need for person-years of reinforcement learning with human feedback in the loop, rendering it achievable for a small team committed to spending a week on prompt creation.
 
@@ -92,9 +91,9 @@ An official announcement is anticipated, which will shed light on how the amalga
 
 Although it was introduced a couple of months ago, Microsoft Copilot 365 caught my attention recently. The product is an impressive assembly of prompts and use cases, seamlessly integrated into the Microsoft Office suite. As I'm not a Windows/Microsoft user, I'm not privy to its actual functionality or performance. Nevertheless, it's inspiring to see a myriad of ideas on enhancing productivity using LLMs, even if it's more aspirational than real at this point.
 
-## Updates
+## Updates + Ideas
 
-# Progress on Artificial General Intelligence
+# Jamming on Artificial General Intelligence
 
 Last week, I dedicated my time to an experiment centered around Artificial General Intelligence (AGI). My ambition was to develop a planning AI, capable of extending its own capabilities and devising work strategies for other agents to execute. While a week wasn't sufficient to fully realize my vision, I did make significant headway in crafting a functional prototype. 
 
@@ -104,7 +103,7 @@ Navigating the complexities of AI autonomy presents some notable challenges:
 
 Further insights about this fascinating journey in the world of AGI can be found in my recent blog post on the [current state of AGI]({% post_url 2023-05-21-adventures-in-agi-1 %}). 
 
-# Leveraging ChatGPT: A Guided Approach for Young Minds
+# Using ChatGPT as a Student
 
 Contemplating the appropriate use of AI, particularly ChatGPT, as a writing assistant for my children has prompted thoughtful consideration. Recent studies suggest one in five college students employ GPT in their work. Unfortunately, there are instances where students pass off ChatGPT's work as their own. This isn't honest and certainly does not contribute positively to their skill development. Hence, my focus is on guiding my children towards a beneficial usage of ChatGPT, one that complements their learning process, rather than hampering it.
 
