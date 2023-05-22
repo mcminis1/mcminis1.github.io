@@ -92,7 +92,9 @@ An official announcement is anticipated, which will shed light on how the amalga
 
 Although it was introduced a couple of months ago, Microsoft Copilot 365 caught my attention recently. The product is an impressive assembly of prompts and use cases, seamlessly integrated into the Microsoft Office suite. As I'm not a Windows/Microsoft user, I'm not privy to its actual functionality or performance. Nevertheless, it's inspiring to see a myriad of ideas on enhancing productivity using LLMs, even if it's more aspirational than real at this point.
 
-## Update: Progress on Artificial General Intelligence
+## Updates
+
+# Progress on Artificial General Intelligence
 
 Last week, I dedicated my time to an experiment centered around Artificial General Intelligence (AGI). My ambition was to develop a planning AI, capable of extending its own capabilities and devising work strategies for other agents to execute. While a week wasn't sufficient to fully realize my vision, I did make significant headway in crafting a functional prototype. 
 
@@ -102,7 +104,7 @@ Navigating the complexities of AI autonomy presents some notable challenges:
 
 Further insights about this fascinating journey in the world of AGI can be found in my recent blog post on the [current state of AGI]({% post_url 2023-05-21-adventures-in-agi-1 %}). 
 
-## Leveraging ChatGPT: A Guided Approach for Young Minds
+# Leveraging ChatGPT: A Guided Approach for Young Minds
 
 Contemplating the appropriate use of AI, particularly ChatGPT, as a writing assistant for my children has prompted thoughtful consideration. Recent studies suggest one in five college students employ GPT in their work. Unfortunately, there are instances where students pass off ChatGPT's work as their own. This isn't honest and certainly does not contribute positively to their skill development. Hence, my focus is on guiding my children towards a beneficial usage of ChatGPT, one that complements their learning process, rather than hampering it.
 
